@@ -16,13 +16,13 @@ export class Game {
   roundTimer: ReturnType<typeof setTimeout> | null;
 
   constructor(payload: GameInitializer) {
-    const { 
-      roomId, 
-      boards, 
-      totalRounds = GAME_CONFIG.TOTAL_ROUNDS, 
-      scoringParams = GAME_CONFIG.SCORE_BY_LENGTH
-    }  = payload;
-    
+    const {
+      roomId,
+      boards,
+      totalRounds = GAME_CONFIG.TOTAL_ROUNDS,
+      scoringParams = GAME_CONFIG.SCORE_BY_LENGTH,
+    } = payload;
+
     this.roomId = roomId;
     this.round = 0;
     this.totalRounds = totalRounds;
@@ -104,30 +104,30 @@ export class Game {
     if (!roundWordsByPlayer) return;
 
     const wordFreq = new Map<string, number>();
-    
+
     for (const words of roundWordsByPlayer.values()) {
       for (const word of words) {
         wordFreq.set(word, (wordFreq.get(word) || 0) + 1);
       }
     }
-  
+
     const results = new Map<string, RoundResult>();
-  
+
     for (const [playerId, words] of roundWordsByPlayer.entries()) {
       let score = 0;
       const accepted = [];
-  
+
       for (const word of words) {
         if (wordFreq.get(word) === 1) {
           score += this.getWordScore(word);
           accepted.push(word);
         }
       }
-  
+
       results.set(playerId, {
         submittedWords: words,
         acceptedWords: accepted,
-        points: score
+        points: score,
       });
     }
 

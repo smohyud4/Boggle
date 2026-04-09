@@ -1,4 +1,3 @@
-import { GAME_CONFIG } from '../constants/config.ts';
 import { Board } from '../types.ts';
 
 // https://boardgames.stackexchange.com/questions/29264/boggle-what-is-the-dice-configuration-for-boggle-in-various-languages
@@ -52,7 +51,10 @@ export function normalizeWords(words: unknown): string[] {
   for (const rawWord of words) {
     if (typeof rawWord !== 'string') continue;
 
-    const cleaned = rawWord.trim().toUpperCase().replace(/[^A-Z]/g, '');
+    const cleaned = rawWord
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z]/g, '');
     if (cleaned.length < 3) continue;
     if (seen.has(cleaned)) continue;
 
@@ -62,4 +64,3 @@ export function normalizeWords(words: unknown): string[] {
 
   return normalized;
 }
-

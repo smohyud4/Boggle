@@ -5,8 +5,18 @@ import { waitingPlayers, games, socketRoomMap } from '../state/store.js';
 import { Player } from '../models/Player.js';
 import { Game } from '../models/Game.js';
 import { generateBoards, normalizeWords } from '../utils/game.ts';
-import { ensureAdmin, getAdminPlayer, lobbySnapshot, shouldCancelInProgressGame } from './helpers.js';
-import type { JoinRoomPayload, LeaveRoomPayload, StartGamePayload, SubmitWordsPayload } from '../types.js';
+import {
+  ensureAdmin,
+  getAdminPlayer,
+  lobbySnapshot,
+  shouldCancelInProgressGame,
+} from './helpers.js';
+import type {
+  JoinRoomPayload,
+  LeaveRoomPayload,
+  StartGamePayload,
+  SubmitWordsPayload,
+} from '../types.js';
 
 function emitError(socket: Socket, message: string, details: Record<string, unknown> = {}): void {
   socket.emit(EVENTS.ERROR, { message, ...details });
@@ -67,7 +77,9 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
         totalScore: game.getTotalScoreById(player.id),
       };
     })
-    .sort((a, b) => b.points - a.points || b.totalScore - a.totalScore || a.name.localeCompare(b.name));
+    .sort(
+      (a, b) => b.points - a.points || b.totalScore - a.totalScore || a.name.localeCompare(b.name),
+    );
 
   io.to(roomId).emit(EVENTS.ROUND_RESULT, {
     roomId,
@@ -90,7 +102,12 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
   });
 }
 
-function removeSocketFromRoom(io: Server, socket: Socket, roomId: string, reason: 'left' | 'disconnected' = 'left'): void {
+function removeSocketFromRoom(
+  io: Server,
+  socket: Socket,
+  roomId: string,
+  reason: 'left' | 'disconnected' = 'left',
+): void {
   const waitingRoom = waitingPlayers.get(roomId);
   const game = games.get(roomId);
   if (!waitingRoom || !game) return;
@@ -184,7 +201,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
         roomId: normalizedRoomId,
         boards: generateBoards(totalRounds || GAME_CONFIG.TOTAL_ROUNDS),
         totalRounds,
-        scoringParams
+        scoringParams,
       });
 
       waitingPlayers.set(normalizedRoomId, waitingRoom);

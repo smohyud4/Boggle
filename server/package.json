@@ -8,7 +8,9 @@
     "test": "echo \"No tests configured\"",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +23,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.3",
     "@types/node": "^22.15.3",
+    "prettier": "3.8.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }

@@ -1,6 +1,6 @@
 import type { GameStatus } from '../types.js';
 
-export const PORT = Number(process.env.PORT || 3001);
+export const PORT = Number(process.env.PORT || 3000);
 export const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
 export const GAME_CONFIG = {
@@ -14,8 +14,8 @@ export const GAME_CONFIG = {
     4: 1,
     5: 2,
     6: 3,
-    7: 5
-  }
+    7: 5,
+  },
 };
 
 export const GAME_STATUS: Record<string, GameStatus> = {

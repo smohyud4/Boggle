@@ -2,12 +2,12 @@ export type GameStatus = 'lobby' | 'in_progress' | 'completed' | 'cancelled';
 
 export type Board = Record<number, string[]>;
 
-export type GameInitializer = { 
-  roomId: string; 
-  boards: string[][]; 
-  totalRounds?: number, 
-  scoringParams?: Record<number, number> 
-}
+export type GameInitializer = {
+  roomId: string;
+  boards: string[][];
+  totalRounds?: number;
+  scoringParams?: Record<number, number>;
+};
 
 export type PlayerSnapshot = {
   id: string;
