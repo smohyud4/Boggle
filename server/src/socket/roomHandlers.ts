@@ -44,6 +44,7 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
     round: roundNumber,
     totalRounds: game.totalRounds,
     board,
+    scoringParams: game.scoringParams,
     expiresAt: game.roundExpiresAt,
   });
 
@@ -90,16 +91,16 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
 
   game.clearRoundTimer();
 
-  if (round < game.totalRounds) {
-    startRound(io, roomId, round + 1);
-    return;
-  }
+  // if (round < game.totalRounds) {
+  //   startRound(io, roomId, round + 1);
+  //   return;
+  // }
 
-  game.status = GAME_STATUS.COMPLETED;
-  io.to(roomId).emit(EVENTS.GAME_OVER, {
-    roomId,
-    leaderboard: game.getFinalLeaderboard(),
-  });
+  // game.status = GAME_STATUS.COMPLETED;
+  // io.to(roomId).emit(EVENTS.GAME_OVER, {
+  //   roomId,
+  //   leaderboard: game.getFinalLeaderboard(),
+  // });
 }
 
 function removeSocketFromRoom(
@@ -279,9 +280,40 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     game.setPlayers(Array.from(waitingRoom.values()));
-    game.start();
-    startRound(io, roomId, game.round);
-    broadcastLobby(io, roomId);
+
+    io.to(roomId).emit(EVENTS.GAME_STARTING);
+
+    setTimeout(() => {
+      game.start();
+      startRound(io, roomId, game.round);
+    }, 5000);
+  });
+
+  socket.on(EVENTS.BEGIN_ROUND, (payload: { roomId: string; round: number }) => {
+    const { roomId, round } = payload;
+    if (!roomId || typeof roomId !== 'string') {
+      emitError(socket, 'Invalid room id.');
+      return;
+    }
+
+    const game = games.get(roomId);
+    if (!game) {
+      emitError(socket, 'Room not found.', { roomId });
+      return;
+    }
+
+    if (game.status !== GAME_STATUS.IN_PROGRESS) {
+      emitError(socket, 'Game is not in progress.', { roomId });
+      return;
+    }
+
+    const player = game.players.find((entry) => entry.id === socket.id);
+    if (!player) {
+      emitError(socket, 'Player is not in this game.', { roomId });
+      return;
+    }
+
+    startRound(io, roomId, round);
   });
 
   socket.on(EVENTS.SUBMIT_WORDS, (payload: SubmitWordsPayload = {}) => {

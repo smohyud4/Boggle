@@ -3,32 +3,15 @@ import LobbyPage from "./components/LobbyPage";
 import WaitingRoom from "./components/WaitingRoom";
 import { socket } from "./socket/client";
 import { SOCKET_EVENTS } from "./socket/events";
+import type {
+  RoomJoinedPayload,
+  LobbyUpdatedPayload,
+  RoundStartPayload,
+  ErrorPayload,
+} from "./types/payload";
+import type { FormMode, ScoringType } from "./types/payload";
 import "./App.css";
-
-type FormMode = "join" | "create";
-type ScoringType = "default" | "equal";
-
-type RoomJoinedPayload = {
-  roomId: string;
-  playerId: string;
-  isAdmin: boolean;
-};
-
-type LobbyPlayer = {
-  id: string;
-  name: string;
-  isAdmin: boolean;
-};
-
-type LobbyUpdatedPayload = {
-  roomId: string;
-  players: LobbyPlayer[];
-  canStart: boolean;
-};
-
-type ErrorPayload = {
-  message?: string;
-};
+import Game from "./components/Game";
 
 function generateRoomCode(): string {
   return Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -43,6 +26,8 @@ function App() {
   const [canStart, setCanStart] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [gameInfo, setGameInfo] = useState<RoundStartPayload | null>(null);
+  const [gameReady, setGameReady] = useState(false);
 
   useEffect(() => {
     const onRoomJoined = (payload: RoomJoinedPayload) => {
@@ -64,8 +49,9 @@ function App() {
       }
     };
 
-    const onRoundStart = () => {
-      window.location.reload();
+    const onRoundStart = (payload: RoundStartPayload) => {
+      setGameInfo(payload);
+      setGameReady(true);
     };
 
     const onError = (payload: ErrorPayload) => {
@@ -162,7 +148,9 @@ function App() {
 
   return (
     <main className="app">
-      {isWaitingRoom ? (
+      {gameReady ? (
+        <Game {...(gameInfo as Required<RoundStartPayload>)} />
+      ) : isWaitingRoom ? (
         <WaitingRoom
           roomId={roomId}
           players={players}

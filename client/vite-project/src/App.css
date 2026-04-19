@@ -110,6 +110,40 @@
   color: #4d5562;
 }
 
+.letter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+
+  .letter {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .active {
+    background-color: transparent;
+  }
+}
+
+.arrow {
+  color: black;
+  font-size: 40px;
+  position: absolute;
+  transform: translate(-50%, -50%); /* Center the arrow on midpoint */
+  pointer-events: none; /* Don't interfere with grid interaction */
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+}
+
 @media (max-width: 480px) {
   .app {
     padding: 12px;
