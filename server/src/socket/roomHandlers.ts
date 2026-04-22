@@ -36,7 +36,7 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
 
   game.round = roundNumber;
   game.initializeRound(roundNumber);
-  game.roundExpiresAt = Date.now() + GAME_CONFIG.ROUND_SECONDS * 1000;
+  game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS / 3) * 1000;
 
   const board = game.getBoardForRound(roundNumber);
   io.to(roomId).emit(EVENTS.ROUND_START, {
@@ -48,10 +48,10 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
     expiresAt: game.roundExpiresAt,
   });
 
-  game.clearRoundTimer();
-  game.roundTimer = setTimeout(() => {
-    settleRound(io, roomId, 'timer_expired');
-  }, GAME_CONFIG.ROUND_SECONDS * 1000);
+  // game.clearRoundTimer();
+  // game.roundTimer = setTimeout(() => {
+  //   settleRound(io, roomId, 'timer_expired');
+  // }, GAME_CONFIG.ROUND_SECONDS * 1000);
 }
 
 function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_submitted'): void {

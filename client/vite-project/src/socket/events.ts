@@ -1,9 +1,15 @@
 export const SOCKET_EVENTS = {
   JOIN_ROOM: "join_room",
   START_GAME: "start_game",
+  SUBMIT_WORDS: "submit_words",
+  BEGIN_ROUND: "begin_round",
   ROOM_JOINED: "room_joined",
   LOBBY_UPDATED: "lobby_updated",
   GAME_STARTING: "game_starting",
   ROUND_START: "round_start",
+  ROUND_RESULT: "round_result",
+  GAME_OVER: "game_over",
+  GAME_CANCELLED: "game_cancelled",
+  PLAYER_LEFT: "player_left",
   ERROR_EVENT: "error_event",
 } as const;

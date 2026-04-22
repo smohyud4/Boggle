@@ -25,9 +25,44 @@ export type ErrorPayload = {
 
 export type RoundStartPayload = {
   roomId: string;
-  roundNumber: number;
+  round: number;
   totalRounds: number;
   board: string[];
   scoringParams: Record<number, number>;
   expiresAt: number;
+};
+
+export type RoundResultPlayerPayload = {
+  playerId: string;
+  name: string;
+  submittedWords: string[];
+  acceptedWords: string[];
+  points: number;
+  totalScore: number;
+};
+
+export type RoundResultPayload = {
+  roomId: string;
+  round: number;
+  reason: "timer_expired" | "all_submitted";
+  results: RoundResultPlayerPayload[];
+};
+
+export type GameOverPayload = {
+  roomId: string;
+  leaderboard: Array<{
+    playerId: string;
+    name: string;
+    totalScore: number;
+  }>;
+};
+
+export type BeginRoundPayload = {
+  roomId: string;
+  round: number;
+};
+
+export type SubmitWordsPayload = {
+  roomId: string;
+  words: string[];
 };

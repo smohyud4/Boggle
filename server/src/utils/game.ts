@@ -3,22 +3,22 @@ import { Board } from '../types.ts';
 // https://boardgames.stackexchange.com/questions/29264/boggle-what-is-the-dice-configuration-for-boggle-in-various-languages
 
 const BOGGLE_DICE: Board = {
-  1: ['R', 'I', 'F', 'O', 'B', 'X'],
-  2: ['I', 'F', 'E', 'H', 'E', 'Y'],
-  3: ['D', 'E', 'N', 'O', 'W', 'S'],
-  4: ['U', 'T', 'O', 'K', 'N', 'D'],
-  5: ['H', 'M', 'S', 'R', 'A', 'O'],
-  6: ['L', 'U', 'P', 'E', 'T', 'S'],
-  7: ['A', 'C', 'I', 'T', 'O', 'A'],
-  8: ['Y', 'L', 'G', 'K', 'U', 'E'],
-  9: ['QU', 'B', 'M', 'J', 'O', 'A'],
-  10: ['E', 'H', 'I', 'S', 'P', 'N'],
-  11: ['V', 'E', 'T', 'I', 'G', 'N'],
-  12: ['B', 'A', 'L', 'I', 'Y', 'T'],
-  13: ['E', 'Z', 'A', 'V', 'N', 'D'],
-  14: ['R', 'A', 'L', 'E', 'S', 'C'],
-  15: ['U', 'W', 'I', 'L', 'R', 'G'],
-  16: ['P', 'A', 'C', 'E', 'M', 'D'],
+  1: ['r', 'i', 'f', 'o', 'b', 'x'],
+  2: ['i', 'f', 'e', 'h', 'e', 'y'],
+  3: ['d', 'e', 'n', 'o', 'w', 's'],
+  4: ['u', 't', 'o', 'k', 'n', 'd'],
+  5: ['h', 'm', 's', 'r', 'a', 'o'],
+  6: ['l', 'u', 'p', 'e', 't', 's'],
+  7: ['a', 'c', 'i', 't', 'o', 'a'],
+  8: ['y', 'l', 'g', 'k', 'u', 'e'],
+  9: ['qu', 'b', 'm', 'j', 'o', 'a'],
+  10: ['e', 'h', 'i', 's', 'p', 'n'],
+  11: ['v', 'e', 't', 'i', 'g', 'n'],
+  12: ['b', 'a', 'l', 'i', 'y', 't'],
+  13: ['e', 'z', 'a', 'v', 'n', 'd'],
+  14: ['r', 'a', 'l', 'e', 's', 'c'],
+  15: ['u', 'w', 'i', 'l', 'r', 'g'],
+  16: ['p', 'a', 'c', 'e', 'm', 'd'],
 };
 
 export function generateBoard(): string[] {

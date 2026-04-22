@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Arrow, { type ArrowProps } from "./Arrow";
+import { socket } from "../socket/client";
+import { SOCKET_EVENTS } from "../socket/events";
 import type { RoundStartPayload } from "../types/payload";
 
 function getArrowString(direction: string) {
@@ -29,8 +30,14 @@ function getArrowString(direction: string) {
 
 type GameProps = RoundStartPayload;
 
-function Game({ roundNumber, totalRounds, board, scoringParams }: GameProps) {
-  const [currBoard, setCurrBoard] = useState<string[]>(board);
+function Game({
+  roomId,
+  round,
+  totalRounds,
+  board,
+  scoringParams,
+  expiresAt,
+}: GameProps) {
   const [word, setWord] = useState("");
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [currScore, setCurrScore] = useState(0);
@@ -38,19 +45,23 @@ function Game({ roundNumber, totalRounds, board, scoringParams }: GameProps) {
   const [highlighted, setHighlighted] = useState<number[]>([]);
   const [arrows, setArrows] = useState<ArrowProps[]>([]);
   const [prevIndex, setPrevIndex] = useState(-1);
-  const [active, setActive] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(() =>
+    Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000)),
+  );
 
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
+  const selectionActiveRef = useRef(false);
+  const roundSubmittedRef = useRef(false);
 
-  const ROWS = Math.sqrt(currBoard.length);
+  const ROWS = Math.sqrt(board.length);
   const COLS = ROWS;
 
   useEffect(() => {
     const fetchValidWords = async () => {
       try {
-        const response = await fetch(`word-list.txt`);
+        const response = await fetch("word-list.txt");
         const data = await response.text();
-        setValidWords(new Set(data.split("\n").map((word) => word.trim())));
+        setValidWords(new Set(data.split("\n").map((entry) => entry.trim())));
       } catch (error) {
         console.error("Error fetching valid words:", error);
       }
@@ -59,28 +70,59 @@ function Game({ roundNumber, totalRounds, board, scoringParams }: GameProps) {
     fetchValidWords();
   }, []);
 
-  function getWordScore(word: string) {
-    if (Object.keys(scoringParams).length === 0) return 1;
-    if (word.length >= 8) return 11;
-    return scoringParams[word.length] || 0;
-  }
+  useEffect(() => {
+    const resetRound = () => {
+      setWord("");
+      setFoundWords([]);
+      setCurrScore(0);
+      setHighlighted([]);
+      setPrevIndex(-1);
+      setArrows([]);
+      roundSubmittedRef.current = false;
+      selectionActiveRef.current = false;
+    };
 
-  const rotateBoard = (clockWise: boolean) => {
-    console.log(clockWise);
+    resetRound();
+  }, [round]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      const remainingSeconds = Math.max(
+        0,
+        Math.ceil((expiresAt - Date.now()) / 1000),
+      );
+      setSecondsLeft(remainingSeconds);
+
+      if (remainingSeconds === 0 && !roundSubmittedRef.current) {
+        roundSubmittedRef.current = true;
+        socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
+          roomId,
+          words: foundWords,
+        });
+      }
+    }, 250);
+
+    return () => window.clearInterval(timer);
+  }, [expiresAt, foundWords, roomId]);
+
+  const getWordScore = (candidate: string) => {
+    if (Object.keys(scoringParams).length === 0) return 1;
+    if (candidate.length >= 8) return 11;
+    return scoringParams[candidate.length] || 0;
   };
 
   const validMove = (index: number) => {
-    if (!active || highlighted.includes(index)) return false;
+    if (!selectionActiveRef.current || highlighted.includes(index))
+      return false;
 
-    const row = Math.floor(index / ROWS),
-      prevRow = Math.floor(prevIndex / ROWS);
-    const col = index % COLS,
-      prevCol = prevIndex % COLS;
+    const row = Math.floor(index / ROWS);
+    const prevRow = Math.floor(prevIndex / ROWS);
+    const col = index % COLS;
+    const prevCol = prevIndex % COLS;
 
     if (row === prevRow && Math.abs(index - prevIndex) === 1) return true;
     if (col === prevCol && Math.abs(index - prevIndex) === COLS) return true;
 
-    // Diag
     return Math.abs(row - prevRow) === 1 && Math.abs(col - prevCol) === 1;
   };
 
@@ -96,8 +138,8 @@ function Game({ roundNumber, totalRounds, board, scoringParams }: GameProps) {
     const midX = (fromRect.left + (toRect.left + toRect.width)) / 2;
     const midY = (fromRect.top + fromRect.height + toRect.top) / 2;
 
-    const left = midX + "px";
-    const top = midY + "px";
+    const left = `${midX}px`;
+    const top = `${midY}px`;
     let direction = "";
 
     if (to === from + 1) {
@@ -122,9 +164,9 @@ function Game({ roundNumber, totalRounds, board, scoringParams }: GameProps) {
   };
 
   const startSelection = (letter: string, index: number) => {
+    selectionActiveRef.current = true;
     setWord(letter);
     setHighlighted([index]);
-    setActive(true);
     setPrevIndex(index);
   };
 
@@ -138,41 +180,72 @@ function Game({ roundNumber, totalRounds, board, scoringParams }: GameProps) {
   };
 
   const endSelection = () => {
-    if (validWords.has(word)) {
+    if (!selectionActiveRef.current) return;
+
+    selectionActiveRef.current = false;
+
+    if (word && validWords.has(word) && !foundWords.includes(word)) {
       setFoundWords((prev) => [...prev, word]);
-      setCurrScore((prev) => (prev += getWordScore(word)));
+      setCurrScore((prev) => prev + getWordScore(word));
     }
 
     setWord("");
-    setActive(false);
     setHighlighted([]);
     setPrevIndex(-1);
     setArrows([]);
   };
 
   return (
-    <div>
-      <h2>{word}</h2>
-      <div className="letter-grid" onPointerLeave={endSelection}>
-        {currBoard.map((letter, index) => (
-          <span
-            key={index}
-            ref={(el) => {
-              letterRefs.current[index] = el;
-            }}
-            className={`letter ${highlighted.includes(index) ? "active" : ""}`}
-            onPointerDown={() => startSelection(letter, index)}
-            onPointerEnter={() => continueSelection(letter, index)}
-            onPointerUp={endSelection}
-          >
-            {letter}
-          </span>
-        ))}
+    <section className="game-shell">
+      <div className="game-board-panel">
+        <div className="game-status-row">
+          <div>
+            <p className="game-eyebrow">
+              Round {round} of {totalRounds}
+            </p>
+            <h2>{word || "Build a word"}</h2>
+          </div>
+          <div className="game-timer">{secondsLeft}s</div>
+        </div>
+
+        <div className="letter-grid" onPointerLeave={endSelection}>
+          {board.map((letter, index) => (
+            <span
+              key={index}
+              ref={(el) => {
+                letterRefs.current[index] = el;
+              }}
+              className={`letter ${highlighted.includes(index) ? "active" : ""}`}
+              onPointerDown={() => startSelection(letter, index)}
+              onPointerEnter={() => continueSelection(letter, index)}
+              onPointerUp={endSelection}
+            >
+              {letter}
+            </span>
+          ))}
+        </div>
       </div>
-      <button onClick={() => rotateBoard(true)}>Rotate Clockwise</button>
-      <button onClick={() => rotateBoard(false)}>
-        Rotate CounterClockwise
-      </button>
+
+      <aside className="game-sidebar">
+        <section className="panel game-sidebar__panel">
+          <h3>Found Words</h3>
+          {foundWords.length > 0 ? (
+            <ul className="word-list">
+              {foundWords.map((foundWord) => (
+                <li key={foundWord}>{foundWord}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted-text">No words found yet.</p>
+          )}
+        </section>
+
+        <section className="panel game-sidebar__panel">
+          <h3>Current Score</h3>
+          <p className="score-value">{currScore}</p>
+        </section>
+      </aside>
+
       {createPortal(
         arrows.map((arrow, index) => (
           <Arrow
@@ -184,7 +257,7 @@ function Game({ roundNumber, totalRounds, board, scoringParams }: GameProps) {
         )),
         document.body,
       )}
-    </div>
+    </section>
   );
 }
 
