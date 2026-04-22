@@ -68,7 +68,6 @@ function App() {
     };
 
     const onGameOver = () => {
-      setRoundResult(null);
       setIsSubmitting(false);
       setIsAdvancingRound(false);
     };
