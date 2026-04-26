@@ -137,12 +137,14 @@ function RoundResultModal({
                   {isAdvancing ? "Starting next round..." : "Next Round"}
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowingLeaderboard(true)}
-                >
-                  Show Results
-                </button>
+                !hasMoreRounds && (
+                  <button
+                    type="button"
+                    onClick={() => setShowingLeaderboard(true)}
+                  >
+                    Show Results
+                  </button>
+                )
               )}
             </footer>
           </>

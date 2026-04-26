@@ -13,7 +13,6 @@ export class Game {
   roundSubmissions: Map<number, Map<string, string[]>>;
   roundResults: Map<number, Map<string, RoundResult>>;
   roundExpiresAt: number | null;
-  roundTimer: ReturnType<typeof setTimeout> | null;
 
   constructor(payload: GameInitializer) {
     const {
@@ -33,7 +32,6 @@ export class Game {
     this.roundSubmissions = new Map();
     this.roundResults = new Map();
     this.roundExpiresAt = null;
-    this.roundTimer = null;
   }
 
   setPlayers(players: Player[]): void {
@@ -191,12 +189,5 @@ export class Game {
         place: placement,
       };
     });
-  }
-
-  clearRoundTimer(): void {
-    if (this.roundTimer) {
-      clearTimeout(this.roundTimer);
-      this.roundTimer = null;
-    }
   }
 }

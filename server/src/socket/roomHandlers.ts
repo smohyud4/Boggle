@@ -47,11 +47,6 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
     scoringParams: game.scoringParams,
     expiresAt: game.roundExpiresAt,
   });
-
-  // game.clearRoundTimer();
-  // game.roundTimer = setTimeout(() => {
-  //   settleRound(io, roomId, 'timer_expired');
-  // }, GAME_CONFIG.ROUND_SECONDS * 1000);
 }
 
 function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_submitted'): void {
@@ -88,8 +83,6 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
     reason,
     results: playerResults,
   });
-
-  game.clearRoundTimer();
 
   // if (round < game.totalRounds) {
   //   startRound(io, roomId, round + 1);
@@ -137,7 +130,6 @@ function removeSocketFromRoom(
   }
 
   if (waitingRoom.size === 0) {
-    game.clearRoundTimer();
     waitingPlayers.delete(roomId);
     games.delete(roomId);
     return;
@@ -145,7 +137,6 @@ function removeSocketFromRoom(
 
   if (shouldCancelInProgressGame(game)) {
     game.status = GAME_STATUS.CANCELLED;
-    game.clearRoundTimer();
     io.to(roomId).emit(EVENTS.GAME_CANCELLED, {
       roomId,
       reason: 'not_enough_players',

@@ -12,7 +12,9 @@ import type {
   RoundResultPayload,
   RoundStartPayload,
   RoomJoinedPayload,
+  PlayerLeftPayload,
 } from "./types/payload";
+import { ToastContainer, toast } from "react-toastify";
 import type { FormMode, ScoringType } from "./types/payload";
 import "./App.css";
 
@@ -34,6 +36,8 @@ function App() {
     null,
   );
   const [isAdvancingRound, setIsAdvancingRound] = useState(false);
+
+  const notify = (message: string) => toast(message);
 
   useEffect(() => {
     const onRoomJoined = (payload: RoomJoinedPayload) => {
@@ -72,6 +76,12 @@ function App() {
       setIsAdvancingRound(false);
     };
 
+    const onPlayerLeft = ({ name, reason }: PlayerLeftPayload) => {
+      notify(
+        `${name} has ${reason === "left" ? "left the room" : "disconnected"}.`,
+      );
+    };
+
     const onError = (payload: ErrorPayload) => {
       setError(payload.message || "Something went wrong.");
       setIsSubmitting(false);
@@ -83,6 +93,7 @@ function App() {
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
     socket.on(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
     socket.on(SOCKET_EVENTS.GAME_OVER, onGameOver);
+    socket.on(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
     socket.on(SOCKET_EVENTS.ERROR_EVENT, onError);
 
     return () => {
@@ -91,6 +102,7 @@ function App() {
       socket.off(SOCKET_EVENTS.ROUND_START, onRoundStart);
       socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
       socket.off(SOCKET_EVENTS.GAME_OVER, onGameOver);
+      socket.off(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
       socket.off(SOCKET_EVENTS.ERROR_EVENT, onError);
     };
   }, []);
@@ -233,6 +245,7 @@ function App() {
           onCreate={handleCreate}
         />
       )}
+      <ToastContainer position="top-center" autoClose={3000} />
     </main>
   );
 }

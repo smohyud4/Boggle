@@ -62,6 +62,13 @@ export type BeginRoundPayload = {
   round: number;
 };
 
+export type PlayerLeftPayload = {
+  roomId: string;
+  playerId: string;
+  name: string;
+  reason: "left" | "disconnected";
+};
+
 export type SubmitWordsPayload = {
   roomId: string;
   words: string[];
