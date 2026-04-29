@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { socket } from "../socket/client";
-import { SOCKET_EVENTS } from "../socket/events";
+import { socket } from "../../socket/client";
+import { SOCKET_EVENTS } from "../../socket/events";
+import "./WaitingRoom.css";
 
 type WaitingRoomProps = {
   roomId: string;

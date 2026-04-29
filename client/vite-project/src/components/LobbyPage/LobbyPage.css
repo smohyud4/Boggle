@@ -1,0 +1,41 @@
+.lobby-shell {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  gap: 16px;
+}
+
+.lobby-shell h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+}
+
+.actions button {
+  border: 1px solid #b6b7bc;
+  background: #f7f8fa;
+  color: #1f2430;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.actions button.active {
+  background: #dde7ff;
+  border-color: #8ea8f5;
+}
+
+.error-banner {
+  border: 1px solid #ff9a9a;
+  background: #ffe7e7;
+  color: #7b1616;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0;
+}

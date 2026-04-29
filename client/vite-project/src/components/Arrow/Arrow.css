@@ -1,0 +1,10 @@
+.arrow {
+  color: black;
+  font-size: 40px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+}

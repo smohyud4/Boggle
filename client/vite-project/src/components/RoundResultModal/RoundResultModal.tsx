@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import type { RoundResultPayload } from "../types/payload";
+import type { RoundResultPayload } from "../../types/payload";
+import "./RoundResultModal.css";
 
 type LeaderboardEntry = {
   playerId: string;

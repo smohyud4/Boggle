@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import Arrow, { type ArrowProps } from "./Arrow";
-import { socket } from "../socket/client";
-import { SOCKET_EVENTS } from "../socket/events";
-import type { RoundStartPayload } from "../types/payload";
+import Arrow, { type ArrowProps } from "../Arrow/Arrow";
+import { socket } from "../../socket/client";
+import { SOCKET_EVENTS } from "../../socket/events";
+import type { RoundStartPayload } from "../../types/payload";
+import "./Game.css";
 
 function getArrowString(direction: string) {
   switch (direction) {
@@ -208,43 +209,43 @@ function Game({
           <div className="game-timer">{secondsLeft}s</div>
         </div>
 
-        <div className="letter-grid" onPointerLeave={endSelection}>
-          {board.map((letter, index) => (
-            <span
-              key={index}
-              ref={(el) => {
-                letterRefs.current[index] = el;
-              }}
-              className={`letter ${highlighted.includes(index) ? "active" : ""}`}
-              onPointerDown={() => startSelection(letter, index)}
-              onPointerEnter={() => continueSelection(letter, index)}
-              onPointerUp={endSelection}
-            >
-              {letter}
-            </span>
-          ))}
+        <div className="game-grid-container">
+          <div className="letter-grid" onPointerLeave={endSelection}>
+            {board.map((letter, index) => (
+              <span
+                key={index}
+                ref={(el) => {
+                  letterRefs.current[index] = el;
+                }}
+                className={`letter ${highlighted.includes(index) ? "active" : ""}`}
+                onPointerDown={() => startSelection(letter, index)}
+                onPointerEnter={() => continueSelection(letter, index)}
+                onPointerUp={endSelection}
+              >
+                {letter}
+              </span>
+            ))}
+          </div>
+          <div className="game-sidebar">
+            <div className="word-list">
+              <h3>Found Words</h3>
+              {foundWords.length > 0 ? (
+                <ul>
+                  {foundWords.map((foundWord) => (
+                    <li key={foundWord}>{foundWord}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="muted-text">No words found yet.</p>
+              )}
+            </div>
+            <div className="score-value">
+              <h3>Current Score</h3>
+              <p>{currScore}</p>
+            </div>
+          </div>
         </div>
       </div>
-
-      <aside className="game-sidebar">
-        <section className="panel game-sidebar__panel">
-          <h3>Found Words</h3>
-          {foundWords.length > 0 ? (
-            <ul className="word-list">
-              {foundWords.map((foundWord) => (
-                <li key={foundWord}>{foundWord}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="muted-text">No words found yet.</p>
-          )}
-        </section>
-
-        <section className="panel game-sidebar__panel">
-          <h3>Current Score</h3>
-          <p className="score-value">{currScore}</p>
-        </section>
-      </aside>
 
       {createPortal(
         arrows.map((arrow, index) => (

@@ -1,5 +1,6 @@
-import CreateForm from "./CreateForm";
-import JoinForm from "./JoinForm";
+import CreateForm from "../CreateForm/CreateForm";
+import JoinForm from "../JoinForm/JoinForm";
+import "./LobbyPage.css";
 
 type FormMode = "join" | "create";
 type ScoringType = "default" | "equal";

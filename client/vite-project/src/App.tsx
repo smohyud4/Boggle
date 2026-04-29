@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import LobbyPage from "./components/LobbyPage";
-import WaitingRoom from "./components/WaitingRoom";
-import Game from "./components/Game";
-import RoundResultModal from "./components/RoundResultModal";
+import LobbyPage from "./components/LobbyPage/LobbyPage";
+import WaitingRoom from "./components/WaitingRoom/WaitingRoom";
+import Game from "./components/Game/Game";
+import RoundResultModal from "./components/RoundResultModal/RoundResultModal";
 import { socket } from "./socket/client";
 import { SOCKET_EVENTS } from "./socket/events";
 import type {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import "./JoinForm.css";
 
 type JoinFormProps = {
   isSubmitting: boolean;

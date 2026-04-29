@@ -1,3 +1,5 @@
+import "./Arrow.css";
+
 export type ArrowProps = {
   direction: string;
   top: string;

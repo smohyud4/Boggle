@@ -1,0 +1,48 @@
+.panel {
+  border: 1px solid #d4d6dc;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field input {
+  width: 100%;
+  border: 1px solid #c6c8cf;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font: inherit;
+}
+
+.radios {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.radios label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button {
+  border: 1px solid #b6b7bc;
+  background: #f7f8fa;
+  color: #1f2430;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
