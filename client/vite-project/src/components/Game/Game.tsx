@@ -5,6 +5,7 @@ import { socket } from "../../socket/client";
 import { SOCKET_EVENTS } from "../../socket/events";
 import type { RoundStartPayload } from "../../types/payload";
 import "./Game.css";
+import { toast, ToastContainer } from "react-toastify";
 
 function getArrowString(direction: string) {
   switch (direction) {
@@ -27,6 +28,53 @@ function getArrowString(direction: string) {
     default:
       return "";
   }
+}
+
+function canSpell(board: string[], word: string) {
+  const grid: string[][] = [];
+  const n = Math.sqrt(board.length);
+
+  for (let i = 0; i < n; i++) {
+    grid.push(board.slice(i * n, (i + 1) * n));
+  }
+
+  function dfs(
+    r: number,
+    c: number,
+    index: number,
+    visited = new Set<number>(),
+  ): boolean {
+    if (r < 0 || r >= n || c < 0 || c >= n) return false;
+
+    const square = r * n + c;
+
+    if (visited.has(square)) return false;
+    if (index >= word.length) return false;
+    if (grid[r][c] !== word[index]) return false;
+    if (index == word.length - 1) return true;
+
+    visited.add(square);
+
+    if (dfs(r + 1, c, index + 1, visited)) return true;
+    if (dfs(r - 1, c, index + 1, visited)) return true;
+    if (dfs(r, c - 1, index + 1, visited)) return true;
+    if (dfs(r, c + 1, index + 1, visited)) return true;
+    if (dfs(r + 1, c + 1, index + 1, visited)) return true;
+    if (dfs(r - 1, c - 1, index + 1, visited)) return true;
+    if (dfs(r + 1, c - 1, index + 1, visited)) return true;
+    if (dfs(r - 1, c + 1, index + 1, visited)) return true;
+
+    visited.delete(square);
+    return false;
+  }
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (dfs(i, j, 0)) return true;
+    }
+  }
+
+  return false;
 }
 
 type GameProps = RoundStartPayload;
@@ -53,6 +101,9 @@ function Game({
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
   const roundSubmittedRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const notify = (message: string) => toast(message);
 
   const ROWS = Math.sqrt(board.length);
   const COLS = ROWS;
@@ -180,20 +231,58 @@ function Game({
     setPrevIndex(index);
   };
 
+  const isValidWord = (word: string) => {
+    return (
+      !foundWords.includes(word) &&
+      validWords.has(word) &&
+      canSpell(board, word)
+    );
+  };
+
+  const handleCheckWord = () => {
+    if (!isValidWord(word)) {
+      inputRef.current?.classList.add("invalid");
+      setTimeout(() => {
+        inputRef.current?.classList.remove("invalid");
+      }, 1000);
+      return;
+    }
+
+    const score = getWordScore(word);
+
+    setFoundWords((prev) => [...prev, word]);
+    setCurrScore((prev) => prev + score);
+    setWord("");
+    setHighlighted([]);
+    setPrevIndex(-1);
+    setArrows([]);
+
+    notify(`+${score} points`);
+  };
+
   const endSelection = () => {
     if (!selectionActiveRef.current) return;
 
     selectionActiveRef.current = false;
 
     if (word && validWords.has(word) && !foundWords.includes(word)) {
+      const score = getWordScore(word);
       setFoundWords((prev) => [...prev, word]);
-      setCurrScore((prev) => prev + getWordScore(word));
+      setCurrScore((prev) => prev + score);
+
+      notify(`+${score} points`);
     }
 
     setWord("");
     setHighlighted([]);
     setPrevIndex(-1);
     setArrows([]);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleCheckWord();
+    }
   };
 
   return (
@@ -204,7 +293,16 @@ function Game({
             <p className="game-eyebrow">
               Round {round} of {totalRounds}
             </p>
-            <h2>{word || "Build a word"}</h2>
+            <div className="word-entry-row">
+              <input
+                ref={inputRef}
+                className="word-input"
+                value={word}
+                onChange={(event) => setWord(event.target.value.toLowerCase())}
+                onKeyDown={handleKeyDown}
+                placeholder="Build a word"
+              />
+            </div>
           </div>
           <div className="game-timer">{secondsLeft}s</div>
         </div>
@@ -227,8 +325,8 @@ function Game({
             ))}
           </div>
           <div className="game-sidebar">
-            <div className="word-list">
-              <h3>Found Words</h3>
+            <div className="word-container">
+              <h3>Words</h3>
               {foundWords.length > 0 ? (
                 <ul>
                   {foundWords.map((foundWord) => (
@@ -239,13 +337,22 @@ function Game({
                 <p className="muted-text">No words found yet.</p>
               )}
             </div>
-            <div className="score-value">
-              <h3>Current Score</h3>
-              <p>{currScore}</p>
+            <div className="score-container">
+              <h3>Score</h3>
+              <p className="score-value">{currScore}</p>
             </div>
           </div>
         </div>
+        <button
+          className="check-button"
+          type="button"
+          onClick={handleCheckWord}
+        >
+          Check
+        </button>
       </div>
+
+      <ToastContainer position="top-center" autoClose={1000} />
 
       {createPortal(
         arrows.map((arrow, index) => (

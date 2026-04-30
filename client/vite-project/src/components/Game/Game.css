@@ -63,6 +63,7 @@
   padding: 10px;
   grid-template-columns: repeat(4, 1fr);
   width: 70%;
+  border-radius: 5px;
   gap: 8px;
 }
 
@@ -88,23 +89,63 @@
   background-color: transparent;
 }
 
-.word-list {
+.word-container {
+  border-radius: 5px;
+  padding: 10px;
   background-color: rgba(251, 251, 211, 0.934);
-  flex: 2;
+  flex: 3;
   overflow-x: hidden;
   overflow-y: scroll;
 }
 
-.score-value {
+.word-container ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.score-container {
+  border-radius: 5px;
+  padding: 10px;
   margin: 0;
   background-color: rgba(251, 251, 211, 0.934);
   flex: 1;
   overflow: hidden;
 }
 
+.word-entry-row .score-value {
+  margin-top: 5%;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.word-entry-row .word-input {
+  border: 1px solid transparent;
+  background-color: transparent;
+  max-width: 200px;
+  outline: none;
+  font-size: 1.2rem;
+  font-weight: 540;
+}
+
 .muted-text {
   margin: 0;
   color: #5b6475;
+}
+
+.invalid {
+  animation: flash-red 1s ease-in-out;
+}
+
+@keyframes flash-red {
+  0% {
+    color: rgba(255, 0, 0, 0.86);
+  }
+  50% {
+    color: transparent;
+  }
+  100% {
+    color: rgba(255, 0, 0, 0.86);
+  }
 }
 
 @media (max-width: 480px) {
