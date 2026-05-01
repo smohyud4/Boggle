@@ -54,6 +54,7 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
   if (!game || game.status !== GAME_STATUS.IN_PROGRESS) return;
 
   const round = game.round;
+  const finalRound = round >= game.totalRounds;
   const resultMap = game.scoreRound();
 
   const playerResults = game.players
@@ -70,12 +71,16 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
         submittedWords: roundEntry.submittedWords,
         acceptedWords: roundEntry.acceptedWords,
         points: roundEntry.points,
+        totalWords: game.getTotalWordsById(player.id),
         totalScore: game.getTotalScoreById(player.id),
       };
     })
-    .sort(
-      (a, b) => b.points - a.points || b.totalScore - a.totalScore || a.name.localeCompare(b.name),
-    );
+    .sort((a, b) => {
+      if (finalRound) {
+        return b.points - a.points;
+      }
+      return b.totalScore - a.totalScore || b.totalWords - a.totalWords;
+    });
 
   io.to(roomId).emit(EVENTS.ROUND_RESULT, {
     roomId,
@@ -83,6 +88,8 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
     reason,
     results: playerResults,
   });
+
+  if (finalRound) game.status = GAME_STATUS.COMPLETED;
 
   // if (round < game.totalRounds) {
   //   startRound(io, roomId, round + 1);

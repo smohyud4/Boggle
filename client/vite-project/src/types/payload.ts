@@ -38,6 +38,7 @@ export type RoundResultPlayerPayload = {
   submittedWords: string[];
   acceptedWords: string[];
   points: number;
+  totalWords: number;
   totalScore: number;
 };
 

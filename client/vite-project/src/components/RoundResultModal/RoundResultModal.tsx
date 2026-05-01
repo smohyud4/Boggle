@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { RoundResultPayload } from "../../types/payload";
 import RoundResultCard from "./RoundResultCard";
 import "./RoundResultModal.css";
@@ -6,6 +6,7 @@ import "./RoundResultModal.css";
 type LeaderboardEntry = {
   playerId: string;
   name: string;
+  totalWords: number;
   totalScore: number;
 };
 
@@ -29,6 +30,7 @@ function LeaderBoard({ entries, onRefresh }: LeaderBoardProps) {
           <li key={entry.playerId} className="leaderboard__row">
             <span className="leaderboard__rank">{index + 1}</span>
             <span className="leaderboard__name">{entry.name}</span>
+            <span className="leaderboard__score">{entry.totalWords}</span>
             <span className="leaderboard__score">{entry.totalScore}</span>
           </li>
         ))}
@@ -61,15 +63,7 @@ function RoundResultModal({
   const hasMoreRounds = roundResult.round < totalRounds;
   const [showingLeaderboard, setShowingLeaderboard] = useState(false);
 
-  const leaderboardEntries = useMemo(
-    () =>
-      [...roundResult.results].sort(
-        (left, right) =>
-          right.totalScore - left.totalScore ||
-          left.name.localeCompare(right.name),
-      ),
-    [roundResult.results],
-  );
+  const leaderboardEntries = roundResult.results;
 
   const handleRefresh = () => {
     window.location.reload();

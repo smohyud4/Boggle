@@ -166,6 +166,15 @@ export class Game {
     return total;
   }
 
+  getTotalWordsById(playerId: string): number {
+    let total = 0;
+    for (const roundResult of this.roundResults.values()) {
+      const playerResult = roundResult.get(playerId);
+      if (playerResult) total += playerResult.acceptedWords.length;
+    }
+    return total;
+  }
+
   getFinalLeaderboard(): LeaderboardEntry[] {
     const ranked = this.players
       .map((player) => ({
