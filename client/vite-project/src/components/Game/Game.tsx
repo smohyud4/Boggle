@@ -5,7 +5,6 @@ import { socket } from "../../socket/client";
 import { SOCKET_EVENTS } from "../../socket/events";
 import type { RoundStartPayload } from "../../types/payload";
 import "./Game.css";
-import { toast, ToastContainer } from "react-toastify";
 
 function getArrowString(direction: string) {
   switch (direction) {
@@ -103,8 +102,6 @@ function Game({
   const roundSubmittedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const notify = (message: string) => toast(message);
-
   const ROWS = Math.sqrt(board.length);
   const COLS = ROWS;
 
@@ -151,6 +148,8 @@ function Game({
           roomId,
           words: foundWords,
         });
+
+        window.clearInterval(timer);
       }
     }, 250);
 
@@ -256,8 +255,6 @@ function Game({
     setHighlighted([]);
     setPrevIndex(-1);
     setArrows([]);
-
-    notify(`+${score} points`);
   };
 
   const endSelection = () => {
@@ -269,8 +266,6 @@ function Game({
       const score = getWordScore(word);
       setFoundWords((prev) => [...prev, word]);
       setCurrScore((prev) => prev + score);
-
-      notify(`+${score} points`);
     }
 
     setWord("");
@@ -351,8 +346,6 @@ function Game({
           Check
         </button>
       </div>
-
-      <ToastContainer position="top-center" autoClose={1000} />
 
       {createPortal(
         arrows.map((arrow, index) => (

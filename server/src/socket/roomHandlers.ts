@@ -36,7 +36,7 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
 
   game.round = roundNumber;
   game.initializeRound(roundNumber);
-  game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS / 3) * 1000;
+  game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS / 3) * 100000;
 
   const board = game.getBoardForRound(roundNumber);
   io.to(roomId).emit(EVENTS.ROUND_START, {
