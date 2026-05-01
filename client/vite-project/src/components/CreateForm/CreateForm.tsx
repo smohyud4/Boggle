@@ -54,26 +54,28 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
         />
       </label>
 
-      <fieldset className="field radios">
+      <fieldset className="radios">
         <legend>Scoring</legend>
-        <label>
-          <input
-            type="radio"
-            name="scoringType"
-            checked={scoringType === "default"}
-            onChange={() => setScoringType("default")}
-          />
-          Default Scoring
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="scoringType"
-            checked={scoringType === "equal"}
-            onChange={() => setScoringType("equal")}
-          />
-          Equal Scoring
-        </label>
+        <div className="label-container">
+          <label>
+            <input
+              type="radio"
+              name="scoringType"
+              checked={scoringType === "default"}
+              onChange={() => setScoringType("default")}
+            />
+            Default
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="scoringType"
+              checked={scoringType === "equal"}
+              onChange={() => setScoringType("equal")}
+            />
+            Equal
+          </label>
+        </div>
       </fieldset>
 
       <button type="submit" disabled={isSubmitting}>

@@ -3,11 +3,12 @@
 }
 
 .app {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
 }
 
 @media (max-width: 480px) {

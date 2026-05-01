@@ -1,14 +1,8 @@
-.lobby-shell {
+.waiting-shell {
   width: 100%;
   max-width: 460px;
   display: grid;
   gap: 16px;
-}
-
-.lobby-shell h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  text-align: center;
 }
 
 .room-code {

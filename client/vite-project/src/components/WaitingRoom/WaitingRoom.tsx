@@ -53,7 +53,7 @@ function WaitingRoom({
 
   if (countdown !== null) {
     return (
-      <section className="lobby-shell">
+      <section className="waiting-shell">
         <h1>Game Starting In...</h1>
         <p className="countdown">{countdown}</p>
       </section>
@@ -61,8 +61,7 @@ function WaitingRoom({
   }
 
   return (
-    <section className="lobby-shell">
-      <h1>Waiting Room</h1>
+    <section className="waiting-shell">
       <p className="room-code">Room Code: {roomId}</p>
 
       {error ? <p className="error-banner">{error}</p> : null}

@@ -3,6 +3,7 @@ import LobbyPage from "./components/LobbyPage/LobbyPage";
 import WaitingRoom from "./components/WaitingRoom/WaitingRoom";
 import Game from "./components/Game/Game";
 import RoundResultModal from "./components/RoundResultModal/RoundResultModal";
+import Header from "./components/Header/Header";
 import { socket } from "./socket/client";
 import { SOCKET_EVENTS } from "./socket/events";
 import type {
@@ -15,7 +16,7 @@ import type {
   PlayerLeftPayload,
 } from "./types/payload";
 import { ToastContainer, toast } from "react-toastify";
-import type { FormMode, ScoringType } from "./types/payload";
+import type { ScoringType } from "./types/payload";
 import "./App.css";
 
 function generateRoomCode(): string {
@@ -23,7 +24,6 @@ function generateRoomCode(): string {
 }
 
 function App() {
-  const [activeMode, setActiveMode] = useState<FormMode>("join");
   const [isWaitingRoom, setIsWaitingRoom] = useState(false);
   const [roomId, setRoomId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -106,12 +106,6 @@ function App() {
       socket.off(SOCKET_EVENTS.ERROR_EVENT, onError);
     };
   }, []);
-
-  const handleModeChange = (mode: FormMode) => {
-    setActiveMode(mode);
-    setError("");
-    setIsSubmitting(false);
-  };
 
   const handleJoin = ({
     name,
@@ -202,51 +196,52 @@ function App() {
   };
 
   return (
-    <main className="app">
-      {gameInfo !== null ? (
-        <>
-          <Game
-            key={`${roomId}-${gameInfo.round}`}
-            roomId={roomId}
-            round={gameInfo.round}
-            totalRounds={gameInfo.totalRounds}
-            board={gameInfo.board}
-            scoringParams={gameInfo.scoringParams}
-            expiresAt={gameInfo.expiresAt}
-          />
-
-          {roundResult ? (
-            <RoundResultModal
-              roundResult={roundResult}
+    <>
+      <Header />
+      <main className="app">
+        {gameInfo !== null ? (
+          <>
+            <Game
+              key={`${roomId}-${gameInfo.round}`}
+              roomId={roomId}
+              round={gameInfo.round}
               totalRounds={gameInfo.totalRounds}
-              isAdmin={isAdmin}
-              isAdvancing={isAdvancingRound}
-              onNextRound={handleNextRound}
+              board={gameInfo.board}
+              scoringParams={gameInfo.scoringParams}
+              expiresAt={gameInfo.expiresAt}
             />
-          ) : null}
-        </>
-      ) : isWaitingRoom ? (
-        <WaitingRoom
-          roomId={roomId}
-          players={players}
-          isAdmin={isAdmin}
-          canStart={canStart}
-          isSubmitting={isSubmitting}
-          error={error}
-          onStartGame={handleStartGame}
-        />
-      ) : (
-        <LobbyPage
-          activeMode={activeMode}
-          error={error}
-          isSubmitting={isSubmitting}
-          onChangeMode={handleModeChange}
-          onJoin={handleJoin}
-          onCreate={handleCreate}
-        />
-      )}
-      <ToastContainer position="top-center" autoClose={3000} />
-    </main>
+
+            {roundResult ? (
+              <RoundResultModal
+                roundResult={roundResult}
+                totalRounds={gameInfo.totalRounds}
+                isAdmin={isAdmin}
+                isAdvancing={isAdvancingRound}
+                onNextRound={handleNextRound}
+              />
+            ) : null}
+          </>
+        ) : isWaitingRoom ? (
+          <WaitingRoom
+            roomId={roomId}
+            players={players}
+            isAdmin={isAdmin}
+            canStart={canStart}
+            isSubmitting={isSubmitting}
+            error={error}
+            onStartGame={handleStartGame}
+          />
+        ) : (
+          <LobbyPage
+            error={error}
+            isSubmitting={isSubmitting}
+            onJoin={handleJoin}
+            onCreate={handleCreate}
+          />
+        )}
+        <ToastContainer position="top-center" autoClose={3000} />
+      </main>
+    </>
   );
 }
 

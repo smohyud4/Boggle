@@ -1,34 +1,22 @@
 .lobby-shell {
+  width: 98%;
+  max-width: 900px;
+}
+
+.forms-row {
+  display: flex;
   width: 100%;
-  max-width: 460px;
-  display: grid;
-  gap: 16px;
+  gap: 24px;
+  align-items: stretch;
 }
 
-.lobby-shell h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  text-align: center;
+.form-slot {
+  flex: 1;
+  display: flex;
 }
 
-.actions {
-  display: grid;
-  gap: 10px;
-}
-
-.actions button {
-  border: 1px solid #b6b7bc;
-  background: #f7f8fa;
-  color: #1f2430;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font: inherit;
-  cursor: pointer;
-}
-
-.actions button.active {
-  background: #dde7ff;
-  border-color: #8ea8f5;
+.form-slot > * {
+  flex: 1;
 }
 
 .error-banner {
@@ -38,4 +26,14 @@
   border-radius: 8px;
   padding: 10px 12px;
   margin: 0;
+}
+
+@media (max-width: 760px) {
+  .forms-row {
+    flex-direction: column;
+  }
+
+  .form-slot {
+    min-width: unset;
+  }
 }

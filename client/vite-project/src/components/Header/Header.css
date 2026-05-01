@@ -1,0 +1,19 @@
+.app-header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}

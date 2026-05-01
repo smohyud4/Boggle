@@ -26,9 +26,17 @@
 }
 
 .radios {
+  display: flex;
+  flex-direction: column;
   border: none;
   margin: 0;
   padding: 0;
+}
+
+.label-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 .radios label {

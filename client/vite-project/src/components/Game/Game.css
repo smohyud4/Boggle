@@ -1,7 +1,6 @@
 .game-shell {
   width: 95%;
   max-width: 550px;
-  min-height: calc(100vh - 48px);
   display: grid;
   gap: 20px;
   place-items: center;
