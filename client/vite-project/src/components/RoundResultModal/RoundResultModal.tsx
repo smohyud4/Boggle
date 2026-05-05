@@ -16,6 +16,13 @@ type LeaderBoardProps = {
 };
 
 function LeaderBoard({ entries, onRefresh }: LeaderBoardProps) {
+  const getLeaderboardClass = (index: number) => {
+    if (index === 0) return " --first";
+    if (index === 1) return " --second";
+    if (index === 2) return " --third";
+    return "";
+  };
+
   return (
     <section className="leaderboard">
       <header className="leaderboard__header">
@@ -26,12 +33,30 @@ function LeaderBoard({ entries, onRefresh }: LeaderBoardProps) {
       </header>
 
       <ol className="leaderboard__list">
+        <li className="table__header">
+          <div className="left-data">
+            <span className="leaderboard__rank"></span>
+            <span className="leaderboard__name">Player</span>
+          </div>
+          <div className="right-data">
+            <span className="leaderboard__score">Words</span>
+            <span className="leaderboard__score">Score</span>
+          </div>
+        </li>
         {entries.map((entry, index) => (
           <li key={entry.playerId} className="leaderboard__row">
-            <span className="leaderboard__rank">{index + 1}</span>
-            <span className="leaderboard__name">{entry.name}</span>
-            <span className="leaderboard__score">{entry.totalWords}</span>
-            <span className="leaderboard__score">{entry.totalScore}</span>
+            <div className="left-data">
+              <span
+                className={`leaderboard__rank${getLeaderboardClass(index)}`}
+              >
+                {index + 1}
+              </span>
+              <span className="leaderboard__name">{entry.name}</span>
+            </div>
+            <div className="right-data">
+              <span className="leaderboard__score">{entry.totalWords}</span>
+              <span className="leaderboard__score">{entry.totalScore}</span>
+            </div>
           </li>
         ))}
       </ol>
