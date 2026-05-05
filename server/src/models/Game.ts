@@ -73,11 +73,6 @@ export class Game {
     if (!roundSubmissions) return;
 
     roundSubmissions.set(playerId, words);
-
-    const player = this.players.find((entry) => entry.id === playerId);
-    if (player) {
-      player.setWords(round, words);
-    }
   }
 
   hasSubmitted(playerId: string, round = this.round): boolean {

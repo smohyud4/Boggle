@@ -191,13 +191,16 @@
 }
 
 .leaderboard__list li {
-  list-style: none;
   margin: 0;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   font-size: 1.2rem;
   gap: 10px;
+}
+
+.leaderboard__list .table__header {
+  font-size: 1rem;
 }
 
 .leaderboard__list .--first {

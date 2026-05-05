@@ -94,8 +94,9 @@ function Game({
   const [arrows, setArrows] = useState<ArrowProps[]>([]);
   const [prevIndex, setPrevIndex] = useState(-1);
   const [secondsLeft, setSecondsLeft] = useState(() =>
-    Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000)),
+    Math.ceil((expiresAt - Date.now()) / 1000),
   );
+  const [roundOver, setRoundOver] = useState(false);
 
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
@@ -143,6 +144,7 @@ function Game({
       setSecondsLeft(remainingSeconds);
 
       if (remainingSeconds === 0 && !roundSubmittedRef.current) {
+        setRoundOver(true);
         roundSubmittedRef.current = true;
         socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
           roomId,
@@ -279,6 +281,10 @@ function Game({
       handleCheckWord();
     }
   };
+
+  if (roundOver) {
+    return <p>Waiting on Server...</p>;
+  }
 
   return (
     <section className="game-shell">

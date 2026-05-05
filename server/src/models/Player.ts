@@ -11,8 +11,4 @@ export class Player {
     this.isAdmin = isAdmin;
     this.words = {};
   }
-
-  setWords(round: number, words: string[]): void {
-    this.words[round] = words;
-  }
 }

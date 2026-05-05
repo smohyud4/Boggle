@@ -122,9 +122,7 @@ function RoundResultModal({
             <p className="result-modal__eyebrow">
               Round {roundResult.round} complete
             </p>
-            <h2 id="round-result-title">
-              {hasMoreRounds ? "Round Results" : "Final Results"}
-            </h2>
+            <h2 id="round-result-title">Round Results</h2>
           </div>
         </header>
 
@@ -142,7 +140,7 @@ function RoundResultModal({
           ) : (
             !hasMoreRounds && (
               <button type="button" onClick={() => setShowingLeaderboard(true)}>
-                Show Results
+                Show Final Results
               </button>
             )
           )}
