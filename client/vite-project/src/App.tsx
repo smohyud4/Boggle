@@ -214,6 +214,7 @@ function App() {
             {roundResult ? (
               <RoundResultModal
                 roundResult={roundResult}
+                roomId={roomId}
                 totalRounds={gameInfo.totalRounds}
                 isAdmin={isAdmin}
                 isAdvancing={isAdvancingRound}

@@ -1,5 +1,6 @@
 import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
 import type { GameInitializer, GameStatus, LeaderboardEntry, RoundResult } from '../types.js';
+import { generateBoards } from '../utils/game.ts';
 import { Player } from './Player.js';
 
 export class Game {
@@ -48,6 +49,13 @@ export class Game {
     const previousLength = this.players.length;
     this.players = this.players.filter((player) => player.name !== name);
     return this.players.length !== previousLength;
+  }
+
+  restart() {
+    this.roundResults = new Map();
+    this.roundExpiresAt = null;
+    this.boards = generateBoards(this.totalRounds);
+    this.start();
   }
 
   start(): void {

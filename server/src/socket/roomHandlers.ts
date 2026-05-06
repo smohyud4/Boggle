@@ -314,6 +314,29 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     startRound(io, roomId, round);
   });
 
+  socket.on(EVENTS.RESTART_GAME, (payload: { roomId: string }) => {
+    const { roomId } = payload;
+
+    if (!roomId || typeof roomId !== 'string') {
+      emitError(socket, 'Invalid room id.');
+      return;
+    }
+
+    const game = games.get(roomId);
+    if (!game) {
+      emitError(socket, 'Room not found.', { roomId });
+      return;
+    }
+
+    if (game.status !== GAME_STATUS.COMPLETED) {
+      emitError(socket, 'Game is not in completed.', { roomId });
+      return;
+    }
+
+    game.restart();
+    startRound(io, roomId, game.round);
+  });
+
   socket.on(EVENTS.SUBMIT_WORDS, (payload: SubmitWordsPayload = {}) => {
     const { roomId, words } = payload;
     if (!roomId || typeof roomId !== 'string') {

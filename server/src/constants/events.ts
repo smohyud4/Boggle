@@ -7,6 +7,7 @@ export const EVENTS = {
   SUBMIT_WORDS: 'submit_words',
   BEGIN_ROUND: 'begin_round',
   GAME_STARTING: 'game_starting',
+  RESTART_GAME: 'restart',
 
   ROOM_JOINED: 'room_joined',
   LOBBY_UPDATED: 'lobby_updated',

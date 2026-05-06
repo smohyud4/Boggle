@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { RoundResultPayload } from "../../types/payload";
 import RoundResultCard from "./RoundResultCard";
 import "./RoundResultModal.css";
+import { socket } from "../../socket/client";
+import { SOCKET_EVENTS } from "../../socket/events";
 
 type LeaderboardEntry = {
   playerId: string;
@@ -13,9 +15,10 @@ type LeaderboardEntry = {
 type LeaderBoardProps = {
   entries: LeaderboardEntry[];
   onRefresh: () => void;
+  onStartNewGame: () => void;
 };
 
-function LeaderBoard({ entries, onRefresh }: LeaderBoardProps) {
+function LeaderBoard({ entries, onRefresh, onStartNewGame }: LeaderBoardProps) {
   const getLeaderboardClass = (index: number) => {
     if (index === 0) return " --first";
     if (index === 1) return " --second";
@@ -62,8 +65,11 @@ function LeaderBoard({ entries, onRefresh }: LeaderBoardProps) {
       </ol>
 
       <footer className="leaderboard__footer">
+        <button type="button" onClick={onStartNewGame}>
+          New Game
+        </button>
         <button type="button" onClick={onRefresh}>
-          Refresh Page
+          Exit Lobby
         </button>
       </footer>
     </section>
@@ -72,6 +78,7 @@ function LeaderBoard({ entries, onRefresh }: LeaderBoardProps) {
 
 type RoundResultModalProps = {
   roundResult: RoundResultPayload;
+  roomId: string;
   totalRounds: number;
   isAdmin: boolean;
   isAdvancing: boolean;
@@ -80,6 +87,7 @@ type RoundResultModalProps = {
 
 function RoundResultModal({
   roundResult,
+  roomId,
   totalRounds,
   isAdmin,
   isAdvancing,
@@ -94,6 +102,10 @@ function RoundResultModal({
     window.location.reload();
   };
 
+  const handleRestartGame = () => {
+    socket.emit(SOCKET_EVENTS.RESTART_GAME, { roomId });
+  };
+
   if (showingLeaderboard) {
     return (
       <div className="modal-backdrop">
@@ -103,7 +115,11 @@ function RoundResultModal({
           aria-modal="true"
           aria-labelledby="round-result-title"
         >
-          <LeaderBoard entries={leaderboardEntries} onRefresh={handleRefresh} />
+          <LeaderBoard
+            entries={leaderboardEntries}
+            onRefresh={handleRefresh}
+            onStartNewGame={handleRestartGame}
+          />
         </section>
       </div>
     );
