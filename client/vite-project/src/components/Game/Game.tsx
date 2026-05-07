@@ -46,22 +46,28 @@ function canSpell(board: string[], word: string) {
     if (r < 0 || r >= n || c < 0 || c >= n) return false;
 
     const square = r * n + c;
+    const cellContent = grid[r][c];
+    const cellLength = cellContent.length;
 
     if (visited.has(square)) return false;
     if (index >= word.length) return false;
-    if (grid[r][c] !== word[index]) return false;
-    if (index == word.length - 1) return true;
+
+    if (cellContent !== word.slice(index, index + cellLength)) return false;
+
+    if (index + cellLength === word.length) return true;
 
     visited.add(square);
 
-    if (dfs(r + 1, c, index + 1, visited)) return true;
-    if (dfs(r - 1, c, index + 1, visited)) return true;
-    if (dfs(r, c - 1, index + 1, visited)) return true;
-    if (dfs(r, c + 1, index + 1, visited)) return true;
-    if (dfs(r + 1, c + 1, index + 1, visited)) return true;
-    if (dfs(r - 1, c - 1, index + 1, visited)) return true;
-    if (dfs(r + 1, c - 1, index + 1, visited)) return true;
-    if (dfs(r - 1, c + 1, index + 1, visited)) return true;
+    const nextIndex = index + cellLength;
+
+    if (dfs(r + 1, c, nextIndex, visited)) return true;
+    if (dfs(r - 1, c, nextIndex, visited)) return true;
+    if (dfs(r, c - 1, nextIndex, visited)) return true;
+    if (dfs(r, c + 1, nextIndex, visited)) return true;
+    if (dfs(r + 1, c + 1, nextIndex, visited)) return true;
+    if (dfs(r - 1, c - 1, nextIndex, visited)) return true;
+    if (dfs(r + 1, c - 1, nextIndex, visited)) return true;
+    if (dfs(r - 1, c + 1, nextIndex, visited)) return true;
 
     visited.delete(square);
     return false;
