@@ -1,14 +1,14 @@
 .game-shell {
-  width: 95%;
+  width: 98%;
   max-width: 550px;
   display: grid;
-  gap: 20px;
+  gap: min(2vh, 20px);
   place-items: center;
 }
 
 .game-board-panel {
   display: grid;
-  gap: 16px;
+  gap: min(2vh, 16px);
   width: 100%;
 }
 
@@ -45,7 +45,6 @@
   justify-content: space-between;
   gap: 3%;
   width: 100%;
-  height: 400px;
 }
 
 .game-sidebar {
@@ -53,7 +52,6 @@
   width: 25%;
   height: 100%;
   flex-direction: column;
-  gap: 10px;
   justify-content: space-between;
 }
 
@@ -64,7 +62,8 @@
   grid-template-columns: repeat(4, 1fr);
   flex: 1;
   border-radius: 5px;
-  gap: 8px;
+  aspect-ratio: 1 / 1;
+  gap: 10px;
 }
 
 .letter-grid .letter {
@@ -73,13 +72,12 @@
   text-transform: uppercase;
   color: #333;
   text-align: center;
-  padding: 10px;
+  padding: min(10px, 1vw);
   background-color: #fff;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   user-select: none;
-  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,7 +89,7 @@
 
 .word-container {
   border-radius: 5px;
-  padding: 10px;
+  padding: min(10px, 1vw);
   background-color: rgba(251, 251, 211, 0.934);
   height: 65%;
   max-width: 95%;
@@ -100,6 +98,7 @@
 
 .word-container::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 .word-container::-webkit-scrollbar-thumb {
@@ -119,15 +118,14 @@
 
 .score-container {
   border-radius: 5px;
-  padding: 10px;
+  padding: min(10px, 1vw);
   margin: 0;
   background-color: rgba(251, 251, 211, 0.934);
   max-width: 95%;
-  height: 20%;
+  height: 25%;
 }
 
 .word-entry-row .score-value {
-  margin-top: 5%;
   font-size: 1.5rem;
   font-weight: 500;
 }
@@ -146,6 +144,17 @@
   color: #5b6475;
 }
 
+.game-sidebar h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.score-value {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
 .invalid {
   animation: flash-red 1s ease-in-out;
 }
@@ -162,17 +171,40 @@
   }
 }
 
-@media (max-width: 480px) {
-  .game-shell {
-    grid-template-columns: 1fr;
-    min-height: calc(100vh - 24px);
+@media (max-width: 520px) {
+
+  .game-grid-container {
+    flex-direction: column;
+  }
+
+  .game-sidebar {
+    width: 100%;
+    height: 25%;
+    flex-direction: row-reverse;
+  }
+
+  .game-sidebar h3 {
+    font-size: 1rem;
+  }
+
+  .score-container {
+    height: 90%;
+    width: 25%;
+  }
+
+  .word-container {
+    height: 90%;
+    width: 65%;
+    overflow-y: hidden;
+  }
+
+  .word-container li {
+    margin-right: 4px;
+    display: inline;
   }
 
   .game-sidebar__panel {
     position: static;
   }
 
-  .game-status-row {
-    flex-direction: column;
-  }
 }

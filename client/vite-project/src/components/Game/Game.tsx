@@ -344,13 +344,6 @@ function Game({
             </div>
           </div>
         </div>
-        <button
-          className="check-button"
-          type="button"
-          onClick={handleCheckWord}
-        >
-          Check
-        </button>
       </div>
 
       {createPortal(
