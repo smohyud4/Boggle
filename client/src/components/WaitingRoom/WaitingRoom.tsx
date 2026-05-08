@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { socket } from "../../socket/client";
 import { SOCKET_EVENTS } from "../../socket/events";
+import { RxCopy } from "react-icons/rx";
 import "./WaitingRoom.css";
 
 type WaitingRoomProps = {
@@ -62,10 +63,20 @@ function WaitingRoom({
 
   return (
     <section className="waiting-shell">
-      <p className="room-code">Room Code: {roomId}</p>
+      <div className="code-container">
+        <p className="room-code">Room Code: <span>{roomId}</span></p>
+        <button onClick={() => {
+              navigator.clipboard.writeText(roomId);
+            }}> 
+          Copy Code
+          <RxCopy
+            className="copy-icon"
+          />
+        </button>
+      </div>
 
       {error ? <p className="error-banner">{error}</p> : null}
-
+      
       <div className="panel">
         <h2>Players</h2>
         <ul className="players-list">
@@ -78,6 +89,7 @@ function WaitingRoom({
           <button
             type="button"
             onClick={onStartGame}
+            className={`start-game ${!canStart || isSubmitting ? "disabled" : ""}`}
             disabled={!canStart || isSubmitting}
           >
             {isSubmitting ? "Pending..." : "Start Game"}

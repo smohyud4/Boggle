@@ -1,8 +1,7 @@
 #create-form {
-  border: 1px solid var(--secondary-teal);
   border-radius: 10px;
   background: var(--dark-cream);
-  padding: 16px;
+  padding: 20px;
   display: grid;
   gap: 12px;
 }
@@ -19,7 +18,7 @@
 
 .field input {
   width: 100%;
-  border: 1px solid var(--secondary-teal);
+  border: 1px solid var(--primary-navy);
   background: var(--neutral-cream);
   border-radius: 8px;
   padding: 9px 10px;
@@ -47,7 +46,7 @@
 }
 
 #create-form button {
-  border: 1px solid var(--secondary-teal);
+  border: 1px solid var(--primary-navy);
   background: var(--primary-navy);
   color: white;
   border-radius: 8px;

@@ -65,10 +65,10 @@ function LeaderBoard({ entries, onRefresh, onStartNewGame }: LeaderBoardProps) {
       </ol>
 
       <footer className="leaderboard__footer">
-        <button type="button" onClick={onStartNewGame}>
+        <button type="button" className="new-game" onClick={onStartNewGame}>
           New Game
         </button>
-        <button type="button" onClick={onRefresh}>
+        <button type="button" className="exit-lobby" onClick={onRefresh}>
           Exit Lobby
         </button>
       </footer>

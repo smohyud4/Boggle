@@ -37,6 +37,15 @@
   gap: 16px;
 }
 
+.result-modal__footer button {
+   border: 1px solid #b6b7bc;
+  background: var(--primary-navy);
+  color: white;
+  border-radius: 16px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
 .result-modal__eyebrow {
   margin: 0 0 4px;
   color: var(--muted-text);
@@ -237,8 +246,28 @@
 
 .leaderboard__footer {
   display: flex;
+  gap: 10px;
   justify-content: flex-end;
 }
+
+.new-game {
+border: 1px solid #b6b7bc;
+  background: var(--primary-navy);
+  color: white;
+  border-radius: 16px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.exit-lobby {
+border: 1px solid #b6b7bc;
+  background: var(--secondary-teal);
+  color: white;
+  border-radius: 16px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
 
 @media (max-width: 480px) {
   .leaderboard__list .table__header {
