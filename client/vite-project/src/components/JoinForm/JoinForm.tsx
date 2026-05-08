@@ -17,7 +17,7 @@ function JoinForm({ isSubmitting, onSubmit }: JoinFormProps) {
   };
 
   return (
-    <form className="panel" onSubmit={handleSubmit}>
+    <form id="join-form" onSubmit={handleSubmit}>
       <h2>Join Lobby</h2>
       <label className="field">
         <span>Player name</span>

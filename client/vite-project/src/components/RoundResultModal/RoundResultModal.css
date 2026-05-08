@@ -14,7 +14,7 @@
   height: 100%;
   max-height: none;
   overflow: auto;
-  background: #fff;
+  background: var(--neutral-cream);
   padding: 24px;
   display: grid;
   place-items: center;
@@ -25,7 +25,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  width: 90%;
+  width: 96%;
   margin: 0 auto;
   gap: 16px;
 }
@@ -39,18 +39,18 @@
 
 .result-modal__eyebrow {
   margin: 0 0 4px;
-  color: #5b6475;
+  color: var(--muted-text);
   font-size: 0.9rem;
 }
 
 .result-modal__meta {
   margin: 0;
-  color: #5b6475;
+  color: var(--muted-text);
 }
 
 .result-modal__body {
   display: grid;
-  width: 90%;
+  width: 96%;
   margin: 0 auto;
   gap: 18px;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -59,7 +59,7 @@
 .result-card {
   border: 1px solid #dde1e8;
   border-radius: 18px;
-  background: #f6f8fc;
+  background: var(--dark-cream);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -111,7 +111,7 @@
   min-width: 32px;
   height: 32px;
   border-radius: 999px;
-  background: #e8eef7;
+  background: var(--secondary-teal);
   color: #1f2430;
   font-size: 0.88rem;
   font-weight: 700;
@@ -122,12 +122,11 @@
   overflow-y: auto;
   padding-right: 6px;
   border-radius: 14px;
-  border: 1px solid #e5e9f0;
-  background: #ffffff;
 }
 
 .result-card__accepted-words::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 .result-card__accepted-words::-webkit-scrollbar-thumb {
@@ -150,8 +149,8 @@
 .word-list li {
   padding: 10px 12px;
   border-radius: 12px;
-  background: #f3f6fb;
-  color: #262f44;
+  background: var(--neutral-cream);
+  color: var(--primary-navy);
   font-size: 0.95rem;
 }
 
@@ -223,8 +222,8 @@
   text-align: center;
 }
 
-.leaderboard .leaderboard__row:nth-child(odd) {
-  background: #f6f8fc;
+.leaderboard .leaderboard__row:nth-child(even) {
+  background: var(--dark-cream);
 }
 
 .leaderboard .leaderboard__row {
@@ -242,8 +241,28 @@
 }
 
 @media (max-width: 480px) {
-  .leaderboard__row {
-    grid-template-columns: 40px minmax(0, 1fr);
+  .leaderboard__list .table__header {
+    font-size: 0.8rem;
+  }
+
+  .result-modal {
+    padding: 18px;
+  }
+
+  .result-card {
+    padding: 15px;
+  }
+
+  .leaderboard__list li {
+    font-size: 1rem;
+  }
+
+  .leaderboard__header h3 {
+    font-size: 1.2rem;
+  }
+
+  .leaderboard__list .right-data {
+    width: 40%;
   }
 
   .leaderboard__score {

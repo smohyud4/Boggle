@@ -1,7 +1,12 @@
 :root {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #1f2430;
-  background: #eef1f6;
+  font-family: Geneva, Verdana, sans-serif;
+  color: var(--primary-navy);
+  background: var(--neutral-cream);
+  --primary-navy: #170C79;
+  --secondary-teal: #56B6C6;
+  --neutral-cream: #EFE3CA;
+  --dark-cream: #efd9ab;
+  --muted-text: #6c7285;
 }
 
 body {

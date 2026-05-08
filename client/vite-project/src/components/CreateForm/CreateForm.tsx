@@ -28,7 +28,7 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
   };
 
   return (
-    <form className="panel" onSubmit={handleSubmit}>
+    <form id="create-form" onSubmit={handleSubmit}>
       <h2>Create Lobby</h2>
 
       <label className="field">

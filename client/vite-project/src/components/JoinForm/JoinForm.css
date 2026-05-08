@@ -1,13 +1,13 @@
-.panel {
-  border: 1px solid #d4d6dc;
+#join-form {
+  border: 1px solid var(--secondary-teal);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--dark-cream);
   padding: 16px;
   display: grid;
   gap: 12px;
 }
 
-.panel h2 {
+#join-form h2 {
   margin: 0;
   font-size: 1.2rem;
 }
@@ -19,16 +19,16 @@
 
 .field input {
   width: 100%;
-  border: 1px solid #c6c8cf;
+  border: 1px solid var(--secondary-teal);
   border-radius: 8px;
   padding: 9px 10px;
   font: inherit;
 }
 
-button {
-  border: 1px solid #b6b7bc;
-  background: #f7f8fa;
-  color: #1f2430;
+#join-form button {
+  border: 1px solid var(--secondary-teal);
+  background: var(--primary-navy);
+  color: white;
   border-radius: 8px;
   padding: 10px 14px;
   font: inherit;

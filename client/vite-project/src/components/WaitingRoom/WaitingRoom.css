@@ -8,7 +8,7 @@
 .room-code {
   margin: 0;
   text-align: center;
-  color: #4d5562;
+  color: var(--secondary-teal);
 }
 
 .error-banner {
@@ -21,9 +21,9 @@
 }
 
 .panel {
-  border: 1px solid #d4d6dc;
+  border: 1px solid var(--secondary-teal);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--dark-cream);
   padding: 16px;
   display: grid;
   gap: 12px;
@@ -44,7 +44,7 @@
 
 .waiting-text {
   margin: 0;
-  color: #4d5562;
+  color: var(--secondary-teal);
 }
 
 .countdown {
@@ -54,10 +54,10 @@
   text-align: center;
 }
 
-button {
+.waiting-shell button {
   border: 1px solid #b6b7bc;
-  background: #f7f8fa;
-  color: #1f2430;
+  background: var(--primary-navy);
+  color: white;
   border-radius: 8px;
   padding: 10px 14px;
   font: inherit;
