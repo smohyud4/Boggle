@@ -90,17 +90,6 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
   });
 
   if (finalRound) game.status = GAME_STATUS.COMPLETED;
-
-  // if (round < game.totalRounds) {
-  //   startRound(io, roomId, round + 1);
-  //   return;
-  // }
-
-  // game.status = GAME_STATUS.COMPLETED;
-  // io.to(roomId).emit(EVENTS.GAME_OVER, {
-  //   roomId,
-  //   leaderboard: game.getFinalLeaderboard(),
-  // });
 }
 
 function removeSocketFromRoom(
