@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Arrow, { type ArrowProps } from "../Arrow/Arrow";
-import { socket } from "../../socket/client";
-import { SOCKET_EVENTS } from "../../socket/events";
+// import { socket } from "../../socket/client";
+// import { SOCKET_EVENTS } from "../../socket/events";
 import type { RoundStartPayload } from "../../types/payload";
 import "./Game.css";
 
@@ -152,10 +152,10 @@ function Game({
       if (remainingSeconds === 0 && !roundSubmittedRef.current) {
         setRoundOver(true);
         roundSubmittedRef.current = true;
-        socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
-          roomId,
-          words: foundWords,
-        });
+        // socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
+        //   roomId,
+        //   words: foundWords,
+        // });
 
         window.clearInterval(timer);
       }
@@ -282,6 +282,36 @@ function Game({
     setArrows([]);
   };
 
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!selectionActiveRef.current) return;
+
+    const touch = event.touches[0];
+
+    if (!touch) return;
+
+    const x = touch.clientX;
+    const y = touch.clientY;
+
+    for (let index = 0; index < ROWS * COLS; index++) {
+      const el = letterRefs.current[index];
+
+      if (!el) continue;
+
+      const rect = el.getBoundingClientRect();
+
+      const containsPoint =
+        x >= rect.left &&
+        x <= rect.right &&
+        y >= rect.top &&
+        y <= rect.bottom;
+
+      if (containsPoint) {
+        continueSelection(board[index], index);
+        break;
+      }
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleCheckWord();
@@ -315,7 +345,11 @@ function Game({
         </div>
 
         <div className="game-grid-container">
-          <div className="letter-grid" onPointerLeave={endSelection}>
+          <div 
+            className="letter-grid" 
+            onPointerLeave={endSelection}
+            onTouchMove={handleTouchMove}
+          >
             {board.map((letter, index) => (
               <span
                 key={index}
