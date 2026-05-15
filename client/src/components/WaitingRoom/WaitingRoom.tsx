@@ -64,15 +64,14 @@ function WaitingRoom({
   return (
     <section className="waiting-shell">
       <div className="code-container">
-        <p className="room-code">Room Code: <span>{roomId}</span></p>
-        <button onClick={() => {
-              navigator.clipboard.writeText(roomId);
-            }}> 
-          Copy Code
-          <RxCopy
-            className="copy-icon"
-          />
-        </button>
+        <div className="room-code">
+          Room Code: <span>{roomId}</span>
+          <button onClick={() => {
+            navigator.clipboard.writeText(roomId);
+          }}> 
+            <RxCopy className="copy-icon"/>
+          </button>
+        </div>
       </div>
 
       {error ? <p className="error-banner">{error}</p> : null}

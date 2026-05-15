@@ -7,7 +7,7 @@
 
 .code-container {
   display: flex;
-  align-items: center;
+  justify-content: center;
   gap: 7px;
 }
 
@@ -16,23 +16,27 @@
   align-items: center;
   gap: 5px;
   font-size: 0.8rem;
-  border: 1px solid #b6b7bc;
-  background: var(--secondary-teal);
-  color: white;
+  background-color: var(--secondary-teal);
+  border: transparent;
   padding: 5px 7px;
-  border-radius: 8px;
   cursor: pointer;
 }
 
 .copy-icon {
   height: 20px;
   width: 20px;
+  color: white;
 }
 
 .room-code {
   margin: 0;
-  text-align: center;
-  color: var(--primary-navy);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 5px 5px 10px;
+  color: white;
+  border-radius: 5px;
+  background-color: var(--secondary-teal);
 }
 
 .room-code > span {

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Arrow, { type ArrowProps } from "../Arrow/Arrow";
-// import { socket } from "../../socket/client";
-// import { SOCKET_EVENTS } from "../../socket/events";
+import { socket } from "../../socket/client";
+import { SOCKET_EVENTS } from "../../socket/events";
 import type { RoundStartPayload } from "../../types/payload";
 import "./Game.css";
 
@@ -152,10 +152,10 @@ function Game({
       if (remainingSeconds === 0 && !roundSubmittedRef.current) {
         setRoundOver(true);
         roundSubmittedRef.current = true;
-        // socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
-        //   roomId,
-        //   words: foundWords,
-        // });
+        socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
+          roomId,
+          words: foundWords,
+        });
 
         window.clearInterval(timer);
       }
