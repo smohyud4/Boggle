@@ -351,18 +351,19 @@ function Game({
             onTouchMove={handleTouchMove}
           >
             {board.map((letter, index) => (
-              <span
-                key={index}
-                ref={(el) => {
-                  letterRefs.current[index] = el;
-                }}
-                className={`letter ${highlighted.includes(index) ? "active" : ""}`}
-                onPointerDown={() => startSelection(letter, index)}
-                onPointerEnter={() => continueSelection(letter, index)}
-                onPointerUp={endSelection}
-              >
-                {letter}
-              </span>
+              <div key={index}>
+                <span
+                  ref={(el) => {
+                    letterRefs.current[index] = el;
+                  }}
+                  className={`letter ${highlighted.includes(index) ? "active" : ""}`}
+                  onPointerDown={() => startSelection(letter, index)}
+                  onPointerEnter={() => continueSelection(letter, index)}
+                  onPointerUp={endSelection}
+                >
+                  {letter}
+                </span>
+              </div>
             ))}
           </div>
           <div className="game-sidebar">

@@ -49,6 +49,7 @@
 
 .game-sidebar {
   display: flex;
+  gap: 8px;
   width: 25%;
   height: 100%;
   flex-direction: column;
@@ -64,19 +65,29 @@
   border-radius: 6px;
   aspect-ratio: 1 / 1;
   touch-action: none;
-  gap: 12px;
+  gap: 8px;
+}
+
+.letter-grid > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: min(8px, 1vw);
+  background-color: var(--neutral-cream);
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .letter-grid .letter {
+  width: 100%;
+  height: 100%;
   font-size: 2rem;
   font-weight: bold;
   text-transform: uppercase;
   color: var(--primary-navy);
   text-align: center;
-  padding: min(10px, 1vw);
-  background-color: var(--neutral-cream);
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 50%;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -96,7 +107,7 @@
   border-radius: 6px;
   padding: min(10px, 1vw);
   background-color: var(--dark-cream);
-  height: 65%;
+  flex: 1;
   max-width: 95%;
   overflow: auto;
 }
@@ -231,7 +242,6 @@
 
   .word-container {
     height: 90%;
-    width: 70%;
     overflow-y: hidden;
   }
 
