@@ -1,7 +1,8 @@
+import type { JSX } from "react";
 import "./Arrow.css";
 
 export type ArrowProps = {
-  direction: string;
+  direction: JSX.Element;
   top: string;
   left: string;
 };

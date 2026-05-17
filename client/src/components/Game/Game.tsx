@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type JSX } from "react";
 import { createPortal } from "react-dom";
 import Arrow, { type ArrowProps } from "../Arrow/Arrow";
 import { socket } from "../../socket/client";
@@ -6,27 +6,30 @@ import { SOCKET_EVENTS } from "../../socket/events";
 import type { RoundStartPayload } from "../../types/payload";
 import "./Game.css";
 
-function getArrowString(direction: string) {
-  switch (direction) {
-    case "left":
-      return "\u2190";
-    case "up":
-      return "\u2191";
-    case "right":
-      return "\u2192";
-    case "down":
-      return "\u2193";
-    case "top-right":
-      return "\u2197";
-    case "top-left":
-      return "\u2196";
-    case "bottom-right":
-      return "\u2198";
-    case "bottom-left":
-      return "\u2199";
-    default:
-      return "";
-  }
+import { 
+  ArrowLeft, 
+  ArrowUp, 
+  ArrowRight, 
+  ArrowDown,
+  ArrowUpRight,
+  ArrowUpLeft,
+  ArrowDownRight,
+  ArrowDownLeft
+} from 'lucide-react';
+
+const arrows = {
+  left: <ArrowLeft size={24} />,
+  up: <ArrowUp size={24} />,
+  right: <ArrowRight size={24} />,
+  down: <ArrowDown size={24} />,
+  "top-right": <ArrowUpRight size={24} />,
+  "top-left": <ArrowUpLeft size={24} />,
+  "bottom-right": <ArrowDownRight size={24} />,
+  "bottom-left": <ArrowDownLeft size={24} />
+};
+
+function getArrowString(direction: keyof typeof arrows): JSX.Element {
+  return arrows[direction];
 }
 
 function canSpell(board: string[], word: string) {
@@ -103,6 +106,9 @@ function Game({
     Math.ceil((expiresAt - Date.now()) / 1000),
   );
   const [roundOver, setRoundOver] = useState(false);
+  const [scoreAnimations, setScoreAnimations] = useState<
+    { id: number; points: number }[]
+  >([]);
 
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
@@ -127,6 +133,19 @@ function Game({
   }, []);
 
   useEffect(() => {
+    const timer = window.setInterval(() => {
+      const remainingSeconds = Math.max(
+        0,
+        Math.ceil((expiresAt - Date.now()) / 1000),
+      );
+      setSecondsLeft(remainingSeconds);
+
+      if (remainingSeconds === 0 && !roundSubmittedRef.current) {
+        setRoundOver(true);
+        window.clearInterval(timer);
+      }
+    }, 250);
+
     const resetRound = () => {
       setWord("");
       setFoundWords([]);
@@ -139,30 +158,26 @@ function Game({
     };
 
     resetRound();
-  }, [round]);
+    return () => window.clearInterval(timer);
+  }, [expiresAt]);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      const remainingSeconds = Math.max(
-        0,
-        Math.ceil((expiresAt - Date.now()) / 1000),
-      );
-      setSecondsLeft(remainingSeconds);
+    if (roundOver && !roundSubmittedRef.current) {
+      roundSubmittedRef.current = true;
+      socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
+        roomId,
+        words: foundWords,
+      });
+    }
+  }, [roundOver, roomId, foundWords]);
 
-      if (remainingSeconds === 0 && !roundSubmittedRef.current) {
-        setRoundOver(true);
-        roundSubmittedRef.current = true;
-        socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
-          roomId,
-          words: foundWords,
-        });
-
-        window.clearInterval(timer);
-      }
-    }, 250);
-
-    return () => window.clearInterval(timer);
-  }, [expiresAt, foundWords, roomId]);
+  const triggerScoreAnimation = (points: number) => {
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    setScoreAnimations((prev) => [...prev, { id, points }]);
+    window.setTimeout(() => {
+      setScoreAnimations((prev) => prev.filter((a) => a.id !== id));
+    }, 1000);
+  };
 
   const getWordScore = (candidate: string) => {
     if (Object.keys(scoringParams).length === 0) return 1;
@@ -199,7 +214,7 @@ function Game({
 
     const left = `${midX}px`;
     const top = `${midY}px`;
-    let direction = "";
+    let direction: JSX.Element;
 
     if (to === from + 1) {
       direction = getArrowString("right");
@@ -257,8 +272,9 @@ function Game({
 
     const score = getWordScore(word);
 
-    setFoundWords((prev) => [...prev, word]);
+    setFoundWords((prev) => [word, ...prev]);
     setCurrScore((prev) => prev + score);
+    triggerScoreAnimation(score);
     setWord("");
     setHighlighted([]);
     setPrevIndex(-1);
@@ -270,10 +286,11 @@ function Game({
 
     selectionActiveRef.current = false;
 
-    if (word && validWords.has(word) && !foundWords.includes(word)) {
+    if (validWords.has(word) && !foundWords.includes(word)) {
       const score = getWordScore(word);
-      setFoundWords((prev) => [...prev, word]);
+      setFoundWords((prev) => [word, ...prev]);
       setCurrScore((prev) => prev + score);
+      triggerScoreAnimation(score);
     }
 
     setWord("");
@@ -337,8 +354,11 @@ function Game({
                 value={word}
                 onChange={(event) => setWord(event.target.value.toLowerCase())}
                 onKeyDown={handleKeyDown}
-                placeholder="Build a word"
+                placeholder={scoreAnimations.length > 0 ? "Nice!" : "Build a word"}
               />
+              {scoreAnimations.map((anim) => (
+                <div key={anim.id} className="points-fly">+{anim.points}</div>
+              ))}
             </div>
           </div>
           <div className="game-timer">{secondsLeft}s</div>
