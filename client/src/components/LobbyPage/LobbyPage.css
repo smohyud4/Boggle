@@ -28,3 +28,25 @@
     min-width: unset;
   }
 }
+
+@media (max-width: 480px) {
+  
+  #join-form, #create-form {
+    padding: 16px; 
+    font-size: 0.8rem; 
+  }
+
+  #join-form h2, #create-form h2 {
+    font-size: 0.96rem; 
+  }
+
+  .field input {
+    padding: 7px 8px; 
+  }
+
+  #join-form button, #create-form button {
+    padding: 8px 11px; 
+    font-size: 0.8rem;
+  }
+}
+

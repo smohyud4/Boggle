@@ -49,7 +49,7 @@
 .result-modal__eyebrow {
   margin: 0 0 4px;
   color: var(--muted-text);
-  font-size: 0.9rem;
+  font-size: 0.9em;
 }
 
 .result-modal__meta {
@@ -90,7 +90,7 @@
 .result-card__meta {
   margin: 4px 0 0;
   color: #6c7285;
-  font-size: 0.95rem;
+  font-size: 0.95em;
 }
 
 .result-card__score {
@@ -98,7 +98,7 @@
   font-weight: 700;
   color: #1f2430;
   text-align: right;
-  font-size: 1.05rem;
+  font-size: 1.05em;
 }
 
 .result-card__section {
@@ -122,7 +122,7 @@
   border-radius: 999px;
   background: var(--secondary-teal);
   color: #1f2430;
-  font-size: 0.88rem;
+  font-size: 0.88em;
   font-weight: 700;
 }
 
@@ -159,7 +159,7 @@
 
 .word-list li {
   color: var(--primary-navy);
-  font-size: 0.95rem;
+  font-size: 0.95em;
 }
 
 .muted-text {
@@ -169,47 +169,21 @@
 
 @media (max-width: 480px) {
 
+  .result-modal {
+    padding: 15px;
+    font-size: 0.8rem;
+  }
+
   #round-result-title {
-    font-size: 1.2rem;
     margin-bottom: 0;
   }
 
   .result-card__accepted-words {
     max-height: 120px;
   }
-
-  .result-modal__eyebrow {
-
-    font-size: 0.72rem;
-  }
-
-.result-card__meta {
-  font-size: 0.76rem;
-}
-
-.result-card__score {
-  font-size: 0.84rem;
-}
-
-  .result-card__word-count {
-    font-size: 0.7rem;
-  }
-
-  .result-card h4 {
-    font-size: 0.8rem;
-  }
-
-  .result-card__topline h3 {
-    font-size: 0.94rem;
-  }
-
-  .word-list li {
-    font-size: 0.76rem;
-  }
-
-
-  .result-modal {
-    padding: 15px;
+  
+  .word-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
 
   .result-card {
