@@ -336,10 +336,6 @@ function Game({
     }
   };
 
-  if (roundOver) {
-    return <p>Waiting on Server...</p>;
-  }
-
   return (
     <section className="game-shell">
       <div className="game-board-panel">
@@ -407,6 +403,8 @@ function Game({
           </div>
         </div>
       </div>
+
+      {roundOver && <div className="backdrop"><p>Waiting on Server...</p></div>}
 
       {createPortal(
         arrows.map((arrow, index) => (

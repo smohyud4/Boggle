@@ -1,3 +1,21 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: rgba(10, 14, 24, 0.5);
+  z-index: 20;
+}
+
+.backdrop p {
+  padding: 10px;
+  border-radius: 12px;
+  margin: 0;
+  background-color: var(--primary-navy);
+  color: white;
+}
+
 .game-shell {
   width: 98%;
   max-width: 550px;

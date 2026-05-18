@@ -22,11 +22,11 @@ function WaitingRoom({
   isSubmitting,
   onStartGame,
 }: WaitingRoomProps) {
-  const [countdown, setCountdown] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState(false);
 
   useEffect(() => {
     const onGameStarting = () => {
-      setCountdown(5);
+      setCountdown(true);
     };
 
     socket.on(SOCKET_EVENTS.GAME_STARTING, onGameStarting);
@@ -36,30 +36,19 @@ function WaitingRoom({
     };
   }, []);
 
-  useEffect(() => {
-    if (countdown === null) return;
-
-    if (countdown === 0) {
-      // Timer finished, wait for GAME_READY event from server
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setCountdown(countdown - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [countdown]);
-
-  if (countdown !== null) {
+  if (countdown) {
     return (
-      <section className="waiting-shell">
-        <h1>Game Starting In...</h1>
-        <p className="countdown">{countdown}</p>
+      <section className="starting-shell">
+        <h2>Game is Starting...</h2>
+        <div className="loader-container">
+          {Array.from({ length: 16 }).map((_, index) => (
+            <span key={index} className="loader" />
+          ))}
+        </div>
       </section>
     );
   }
-  
+
   return (
     <section className="waiting-shell">
       <div className="code-container">
@@ -68,7 +57,7 @@ function WaitingRoom({
           <button onClick={() => {
             navigator.clipboard.writeText(roomId);
           }}>
-            <Copy /> 
+            <Copy className="copy-icon" /> 
           </button>
         </div>
       </div>
@@ -79,7 +68,7 @@ function WaitingRoom({
           {players.map((player) => (
             <li key={player.id}>
               {player.name}
-              {player.isAdmin && <Star size={20}/>}
+              {player.isAdmin && <Star className="star-icon" />}
             </li>
           ))}
         </ul>

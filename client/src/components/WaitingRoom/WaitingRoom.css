@@ -1,5 +1,16 @@
+.starting-shell {
+  width: 96%;
+  max-width: 400px;
+  display: grid;
+  place-items: center;
+  gap: 16px;
+  background-color: var(--dark-cream);
+  padding: 24px;
+  border-radius: 12px;
+}
+
 .waiting-shell {
-  width: 100%;
+  width: 96%;
   max-width: 460px;
   display: grid;
   gap: 16px;
@@ -15,7 +26,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.8rem;
+  font-size: 0.8em;
   background-color: var(--secondary-teal);
   border: transparent;
   padding: 5px 7px;
@@ -23,9 +34,13 @@
 }
 
 .copy-icon {
-  height: 20px;
-  width: 20px;
-  color: white;
+  width: 1.6em;
+  height: 1.6em;
+}
+
+.star-icon {
+  width: 1.2em;
+  height: 1.2em;
 }
 
 .room-code {
@@ -53,7 +68,6 @@
 
 .panel h2 {
   margin: 0;
-  font-size: 1.2rem;
 }
 
 .players-list {
@@ -67,11 +81,13 @@
 .players-list li {
   display: flex;
   align-items: center;
+  font-size: 1em;
   gap: 8px;
 }
 
 .waiting-text {
   text-align: center;
+  font-size: 1em;
   margin: 0;
   color: var(--muted-text);
 }
@@ -90,6 +106,7 @@
   border-radius: 8px;
   padding: 10px 14px;
   font: inherit;
+  font-size: 1em;
   cursor: pointer;
 }
 
@@ -97,3 +114,62 @@
   filter: brightness(80%);  
   cursor: not-allowed;
 }
+
+.loader-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  display: inline-block;
+  position: relative;
+}
+.loader::after,
+.loader::before {
+  content: '';
+  width: 48px;
+  height: 48px;
+  border: 2px solid #FFF;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  animation: rotation 2s ease-in-out infinite;
+}
+.loader::after {
+  border-color: var(--secondary-teal);
+  animation-delay: 1s;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
+
+
+@media (max-width: 480px) {
+
+  .starting-shell h2 {
+    font-size: 1.2rem;
+  }
+
+  .panel {
+    font-size: 0.8rem;
+  }
+
+  .room-code {
+    font-size: 0.8rem;
+    justify-content: center;
+  }   
+
+  .countdown {
+    font-size: 2.4rem;
+  }
+}   
