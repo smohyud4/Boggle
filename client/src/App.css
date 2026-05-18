@@ -5,14 +5,33 @@
 .app {
   display: flex;
   align-items: center;
+  position: relative;
   justify-content: center;
   flex: 1;
   overflow: auto;
   padding: 10px;
 }
 
+.error-display {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--primary-navy);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+/* .toast-background {
+  background-color: var(--primary-navy) !important;
+  color: white !important;
+  border-radius: 5px;
+  padding: 10px 15px;
+} */
+
 @media (max-width: 480px) {
   .app {
-    padding: 12px;
+    padding: 5px;
   }
 }

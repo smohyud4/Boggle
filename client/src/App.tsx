@@ -14,6 +14,7 @@ import type {
   RoundStartPayload,
   RoomJoinedPayload,
   PlayerLeftPayload,
+  LobbyPlayer,
 } from "./types/payload";
 import { ToastContainer, toast } from "react-toastify";
 import type { ScoringType } from "./types/payload";
@@ -27,7 +28,7 @@ function App() {
   const [isWaitingRoom, setIsWaitingRoom] = useState(false);
   const [roomId, setRoomId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [players, setPlayers] = useState<string[]>([]);
+  const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [canStart, setCanStart] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +51,7 @@ function App() {
 
     const onLobbyUpdated = (payload: LobbyUpdatedPayload) => {
       setRoomId(payload.roomId);
-      setPlayers(payload.players.map((player) => player.name));
+      setPlayers(payload.players);
       setCanStart(payload.canStart);
 
       const me = payload.players.find((player) => player.id === socket.id);
@@ -211,7 +212,7 @@ function App() {
               expiresAt={gameInfo.expiresAt}
             />
 
-            {roundResult ? (
+            {roundResult !== null ? (
               <RoundResultModal
                 roundResult={roundResult}
                 roomId={roomId}
@@ -229,17 +230,16 @@ function App() {
             isAdmin={isAdmin}
             canStart={canStart}
             isSubmitting={isSubmitting}
-            error={error}
             onStartGame={handleStartGame}
           />
         ) : (
           <LobbyPage
-            error={error}
             isSubmitting={isSubmitting}
             onJoin={handleJoin}
             onCreate={handleCreate}
           />
         )}
+        {error && <div className="error-display">{error}</div>}
         <ToastContainer position="top-center" autoClose={3000} />
       </main>
     </>

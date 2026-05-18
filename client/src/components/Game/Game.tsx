@@ -18,14 +18,14 @@ import {
 } from 'lucide-react';
 
 const arrows = {
-  left: <ArrowLeft size={24} />,
-  up: <ArrowUp size={24} />,
-  right: <ArrowRight size={24} />,
-  down: <ArrowDown size={24} />,
-  "top-right": <ArrowUpRight size={24} />,
-  "top-left": <ArrowUpLeft size={24} />,
-  "bottom-right": <ArrowDownRight size={24} />,
-  "bottom-left": <ArrowDownLeft size={24} />
+  left: <ArrowLeft className="arrow-icon"/>,
+  up: <ArrowUp className="arrow-icon"/>,
+  right: <ArrowRight className="arrow-icon"/>,
+  down: <ArrowDown className="arrow-icon"/>,
+  "top-right": <ArrowUpRight className="arrow-icon"/>,
+  "top-left": <ArrowUpLeft className="arrow-icon"/>,
+  "bottom-right": <ArrowDownRight className="arrow-icon"/>,
+  "bottom-left": <ArrowDownLeft className="arrow-icon"/> 
 };
 
 function getArrowString(direction: keyof typeof arrows): JSX.Element {
@@ -152,6 +152,7 @@ function Game({
       setCurrScore(0);
       setHighlighted([]);
       setPrevIndex(-1);
+      setRoundOver(false);
       setArrows([]);
       roundSubmittedRef.current = false;
       selectionActiveRef.current = false;

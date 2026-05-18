@@ -1,10 +1,15 @@
 .arrow {
   color: var(--primary-navy);
-  font-size: 40px;
+  font-size: 32px;
   position: absolute;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 10;
   margin: 0;
   padding: 0;
+}
+
+.arrow-icon {
+  width: 1em;
+  height: 1em;
 }

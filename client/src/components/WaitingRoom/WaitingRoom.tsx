@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { socket } from "../../socket/client";
 import { SOCKET_EVENTS } from "../../socket/events";
-import { RxCopy } from "react-icons/rx";
 import "./WaitingRoom.css";
+import { Copy, Star } from "lucide-react";
+import type { LobbyPlayer } from "../../types/payload";
 
 type WaitingRoomProps = {
   roomId: string;
-  players: string[];
+  players: LobbyPlayer[];
   isAdmin: boolean;
   canStart: boolean;
   isSubmitting: boolean;
-  error: string;
   onStartGame: () => void;
 };
 
@@ -20,7 +20,6 @@ function WaitingRoom({
   isAdmin,
   canStart,
   isSubmitting,
-  error,
   onStartGame,
 }: WaitingRoomProps) {
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -60,7 +59,7 @@ function WaitingRoom({
       </section>
     );
   }
-
+  
   return (
     <section className="waiting-shell">
       <div className="code-container">
@@ -68,19 +67,20 @@ function WaitingRoom({
           Room Code: <span>{roomId}</span>
           <button onClick={() => {
             navigator.clipboard.writeText(roomId);
-          }}> 
-            <RxCopy className="copy-icon"/>
+          }}>
+            <Copy /> 
           </button>
         </div>
       </div>
 
-      {error ? <p className="error-banner">{error}</p> : null}
-      
       <div className="panel">
         <h2>Players</h2>
         <ul className="players-list">
           {players.map((player) => (
-            <li key={player}>{player}</li>
+            <li key={player.id}>
+              {player.name}
+              {player.isAdmin && <Star size={20}/>}
+            </li>
           ))}
         </ul>
 
