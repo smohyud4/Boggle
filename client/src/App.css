@@ -23,12 +23,12 @@
   border-radius: 5px;
 }
 
-/* .toast-background {
+.toast-background {
+  display: flex;
+  justify-content: center;
   background-color: var(--primary-navy) !important;
   color: white !important;
-  border-radius: 5px;
-  padding: 10px 15px;
-} */
+}
 
 @media (max-width: 480px) {
   .app {

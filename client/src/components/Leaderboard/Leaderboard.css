@@ -115,7 +115,7 @@ border: 1px solid #b6b7bc;
 }
 
 @media (max-width: 480px) {
-  .leaderboard__list .table__header {
+  .leaderboard__list .table__header, .exit-lobby, .new-game {
     font-size: 0.8rem;
   }
 

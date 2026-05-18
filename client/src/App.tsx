@@ -38,7 +38,7 @@ function App() {
   );
   const [isAdvancingRound, setIsAdvancingRound] = useState(false);
 
-  const notify = (message: string) => toast(message);
+  const notify = (message: string) => toast.info(message);
 
   useEffect(() => {
     const onRoomJoined = (payload: RoomJoinedPayload) => {
@@ -240,7 +240,12 @@ function App() {
           />
         )}
         {error && <div className="error-display">{error}</div>}
-        <ToastContainer position="top-center" autoClose={3000} />
+        <ToastContainer 
+          position="top-center" 
+          autoClose={3000}
+          hideProgressBar={true} 
+          theme="colored"
+        />
       </main>
     </>
   );

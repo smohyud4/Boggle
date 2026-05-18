@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { socket } from "../../socket/client";
 import { SOCKET_EVENTS } from "../../socket/events";
-import "./WaitingRoom.css";
-import { Copy, Star } from "lucide-react";
+import { Flip, ToastContainer, toast } from "react-toastify";
+import { Check, Copy, Star } from "lucide-react";
 import type { LobbyPlayer } from "../../types/payload";
+import "./WaitingRoom.css";
 
 type WaitingRoomProps = {
   roomId: string;
@@ -14,6 +15,21 @@ type WaitingRoomProps = {
   onStartGame: () => void;
 };
 
+function ToastComponent() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "5px",
+      }}
+    >
+      <span>Code Copied</span>
+      <Check />
+    </div>
+  );
+}
+
 function WaitingRoom({
   roomId,
   players,
@@ -23,6 +39,14 @@ function WaitingRoom({
   onStartGame,
 }: WaitingRoomProps) {
   const [countdown, setCountdown] = useState(false);
+  const notify = () => {
+    toast(ToastComponent, { 
+      className: 'toast-background', 
+      position: 'bottom-center',
+      pauseOnHover: false,
+      transition: Flip
+    });
+  };
 
   useEffect(() => {
     const onGameStarting = () => {
@@ -55,6 +79,7 @@ function WaitingRoom({
         <div className="room-code">
           Room Code: <span>{roomId}</span>
           <button onClick={() => {
+            notify();
             navigator.clipboard.writeText(roomId);
           }}>
             <Copy className="copy-icon" /> 
@@ -90,6 +115,12 @@ function WaitingRoom({
           <p className="waiting-text">Need at least 2 players to start.</p>
         ) : null}
       </div>
+
+      <ToastContainer 
+        autoClose={3000}
+        hideProgressBar={true} 
+        theme="colored"
+      />
     </section>
   );
 }
