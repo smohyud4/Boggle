@@ -1,7 +1,7 @@
 :root {
   font-family: Geneva, Verdana, sans-serif;
   color: var(--primary-navy);
-  background: var(--neutral-cream);
+  background-image: radial-gradient(var(--neutral-cream), hsl(41, 54%, 75%));
   --primary-navy: #170C79;
   --secondary-teal: #56B6C6;
   --neutral-cream: #EFE3CA;
