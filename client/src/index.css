@@ -2,9 +2,9 @@
   font-family: Geneva, Verdana, sans-serif;
   color: var(--primary-navy);
   background-image: radial-gradient(var(--neutral-cream), hsl(41, 54%, 75%));
-  --primary-navy: #170C79;
-  --secondary-teal: #56B6C6;
-  --neutral-cream: #EFE3CA;
+  --primary-navy: #170c79;
+  --secondary-teal: #56b6c6;
+  --neutral-cream: #efe3ca;
   --dark-cream: #efd9ab;
   --muted-text: #6c7285;
 }

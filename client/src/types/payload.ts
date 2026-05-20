@@ -1,5 +1,5 @@
-export type FormMode = "join" | "create";
-export type ScoringType = "default" | "equal";
+export type FormMode = 'join' | 'create';
+export type ScoringType = 'default' | 'equal';
 
 export type RoomJoinedPayload = {
   roomId: string;
@@ -45,7 +45,7 @@ export type RoundResultPlayerPayload = {
 export type RoundResultPayload = {
   roomId: string;
   round: number;
-  reason: "timer_expired" | "all_submitted";
+  reason: 'timer_expired' | 'all_submitted';
   results: RoundResultPlayerPayload[];
 };
 
@@ -67,7 +67,7 @@ export type PlayerLeftPayload = {
   roomId: string;
   playerId: string;
   name: string;
-  reason: "left" | "disconnected";
+  reason: 'left' | 'disconnected';
 };
 
 export type SubmitWordsPayload = {

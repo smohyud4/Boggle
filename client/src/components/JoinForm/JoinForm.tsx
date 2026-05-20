@@ -1,6 +1,6 @@
-import { useState } from "react";
-import type { FormEvent } from "react";
-import "./JoinForm.css";
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import './JoinForm.css';
 
 type JoinFormProps = {
   isSubmitting: boolean;
@@ -8,8 +8,8 @@ type JoinFormProps = {
 };
 
 function JoinForm({ isSubmitting, onSubmit }: JoinFormProps) {
-  const [name, setName] = useState("");
-  const [roomCode, setRoomCode] = useState("");
+  const [name, setName] = useState('');
+  const [roomCode, setRoomCode] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,7 +42,7 @@ function JoinForm({ isSubmitting, onSubmit }: JoinFormProps) {
       </label>
 
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Joining..." : "Join"}
+        {isSubmitting ? 'Joining...' : 'Join'}
       </button>
     </form>
   );

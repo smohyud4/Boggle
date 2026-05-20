@@ -38,7 +38,7 @@
 }
 
 .result-modal__footer button {
-   border: 1px solid #b6b7bc;
+  border: 1px solid #b6b7bc;
   background: var(--primary-navy);
   color: white;
   border-radius: 16px;
@@ -167,7 +167,6 @@
 }
 
 @media (max-width: 480px) {
-
   .result-modal {
     padding: 15px;
     font-size: 0.8rem;
@@ -180,7 +179,7 @@
   .result-card__accepted-words {
     max-height: 120px;
   }
-  
+
   .word-list {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }

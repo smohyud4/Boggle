@@ -1,22 +1,18 @@
-import { useState } from "react";
-import type { FormEvent } from "react";
-import "./CreateForm.css";
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import './CreateForm.css';
 
-type ScoringType = "default" | "equal";
+type ScoringType = 'default' | 'equal';
 
 type CreateFormProps = {
   isSubmitting: boolean;
-  onSubmit: (payload: {
-    name: string;
-    rounds: number;
-    scoringType: ScoringType;
-  }) => void;
+  onSubmit: (payload: { name: string; rounds: number; scoringType: ScoringType }) => void;
 };
 
 function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
-  const [name, setName] = useState("");
-  const [rounds, setRounds] = useState("3");
-  const [scoringType, setScoringType] = useState<ScoringType>("default");
+  const [name, setName] = useState('');
+  const [rounds, setRounds] = useState('3');
+  const [scoringType, setScoringType] = useState<ScoringType>('default');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -61,8 +57,8 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
             <input
               type="radio"
               name="scoringType"
-              checked={scoringType === "default"}
-              onChange={() => setScoringType("default")}
+              checked={scoringType === 'default'}
+              onChange={() => setScoringType('default')}
             />
             Default
           </label>
@@ -70,8 +66,8 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
             <input
               type="radio"
               name="scoringType"
-              checked={scoringType === "equal"}
-              onChange={() => setScoringType("equal")}
+              checked={scoringType === 'equal'}
+              onChange={() => setScoringType('equal')}
             />
             Equal
           </label>
@@ -79,7 +75,7 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
       </fieldset>
 
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create"}
+        {isSubmitting ? 'Creating...' : 'Create'}
       </button>
     </form>
   );

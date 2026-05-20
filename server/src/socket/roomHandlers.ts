@@ -36,7 +36,7 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
 
   game.round = roundNumber;
   game.initializeRound(roundNumber);
-  game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS) * 1000;
+  game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS / 3) * 1000;
 
   const board = game.getBoardForRound(roundNumber);
   io.to(roomId).emit(EVENTS.ROUND_START, {
@@ -77,7 +77,7 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
     })
     .sort((a, b) => {
       if (!finalRound) {
-        return b.points - a.points;
+        return a.name.localeCompare(b.name);
       }
       return b.totalScore - a.totalScore || b.totalWords - a.totalWords;
     });

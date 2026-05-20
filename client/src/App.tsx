@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import LobbyPage from "./components/LobbyPage/LobbyPage";
-import WaitingRoom from "./components/WaitingRoom/WaitingRoom";
-import Game from "./components/Game/Game";
-import RoundResultModal from "./components/RoundResultModal/RoundResultModal";
-import { socket } from "./socket/client";
-import { SOCKET_EVENTS } from "./socket/events";
+import { useEffect, useState } from 'react';
+import LobbyPage from './components/LobbyPage/LobbyPage';
+import WaitingRoom from './components/WaitingRoom/WaitingRoom';
+import Game from './components/Game/Game';
+import RoundResultModal from './components/RoundResultModal/RoundResultModal';
+import { socket } from './socket/client';
+import { SOCKET_EVENTS } from './socket/events';
 import type {
   BeginRoundPayload,
   ErrorPayload,
@@ -14,10 +14,10 @@ import type {
   RoomJoinedPayload,
   PlayerLeftPayload,
   LobbyPlayer,
-} from "./types/payload";
-import { ToastContainer, toast } from "react-toastify";
-import type { ScoringType } from "./types/payload";
-import "./App.css";
+} from './types/payload';
+import { ToastContainer, toast } from 'react-toastify';
+import type { ScoringType } from './types/payload';
+import './App.css';
 
 function generateRoomCode(): string {
   return Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -25,16 +25,14 @@ function generateRoomCode(): string {
 
 function App() {
   const [isWaitingRoom, setIsWaitingRoom] = useState(false);
-  const [roomId, setRoomId] = useState("");
+  const [roomId, setRoomId] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [canStart, setCanStart] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [gameInfo, setGameInfo] = useState<RoundStartPayload | null>(null);
-  const [roundResult, setRoundResult] = useState<RoundResultPayload | null>(
-    null,
-  );
+  const [roundResult, setRoundResult] = useState<RoundResultPayload | null>(null);
   const [isAdvancingRound, setIsAdvancingRound] = useState(false);
 
   const notify = (message: string) => toast.info(message);
@@ -44,7 +42,7 @@ function App() {
       setRoomId(payload.roomId);
       setIsAdmin(payload.isAdmin);
       setIsWaitingRoom(true);
-      setError("");
+      setError('');
       setIsSubmitting(false);
     };
 
@@ -77,13 +75,11 @@ function App() {
     };
 
     const onPlayerLeft = ({ name, reason }: PlayerLeftPayload) => {
-      notify(
-        `${name} has ${reason === "left" ? "left the room" : "disconnected"}.`,
-      );
+      notify(`${name} has ${reason === 'left' ? 'left the room' : 'disconnected'}.`);
     };
 
     const onError = (payload: ErrorPayload) => {
-      setError(payload.message || "Something went wrong.");
+      setError(payload.message || 'Something went wrong.');
       setIsSubmitting(false);
       setIsAdvancingRound(false);
     };
@@ -107,22 +103,16 @@ function App() {
     };
   }, []);
 
-  const handleJoin = ({
-    name,
-    roomCode,
-  }: {
-    name: string;
-    roomCode: string;
-  }) => {
+  const handleJoin = ({ name, roomCode }: { name: string; roomCode: string }) => {
     const trimmedName = name.trim();
     const trimmedRoomCode = roomCode.trim().toUpperCase();
 
     if (!trimmedName || !trimmedRoomCode) {
-      setError("Player name and room code are required.");
+      setError('Player name and room code are required.');
       return;
     }
 
-    setError("");
+    setError('');
     setIsSubmitting(true);
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
@@ -144,18 +134,18 @@ function App() {
     const sanitizedRounds = Math.max(1, Math.floor(rounds));
 
     if (!trimmedName) {
-      setError("Player name is required.");
+      setError('Player name is required.');
       return;
     }
 
     if (!Number.isFinite(sanitizedRounds) || sanitizedRounds < 1) {
-      setError("Rounds must be a valid number.");
+      setError('Rounds must be a valid number.');
       return;
     }
 
     const createdRoomCode = generateRoomCode();
 
-    setError("");
+    setError('');
     setIsSubmitting(true);
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
@@ -163,25 +153,20 @@ function App() {
       playerName: trimmedName,
       create: true,
       totalRounds: sanitizedRounds,
-      ...(scoringType === "equal" ? { scoringParams: {} } : {}),
+      ...(scoringType === 'equal' ? { scoringParams: {} } : {}),
     });
   };
 
   const handleStartGame = () => {
     if (!isAdmin || !roomId) return;
 
-    setError("");
+    setError('');
     setIsSubmitting(true);
     socket.emit(SOCKET_EVENTS.START_GAME, { roomId });
   };
 
   const handleNextRound = () => {
-    if (
-      !roundResult ||
-      !gameInfo ||
-      !isAdmin ||
-      roundResult.round >= gameInfo.totalRounds
-    ) {
+    if (!roundResult || !gameInfo || !isAdmin || roundResult.round >= gameInfo.totalRounds) {
       return;
     }
 
@@ -190,7 +175,7 @@ function App() {
       round: roundResult.round + 1,
     };
 
-    setError("");
+    setError('');
     setIsAdvancingRound(true);
     socket.emit(SOCKET_EVENTS.BEGIN_ROUND, payload);
   };
@@ -231,17 +216,13 @@ function App() {
             onStartGame={handleStartGame}
           />
         ) : (
-          <LobbyPage
-            isSubmitting={isSubmitting}
-            onJoin={handleJoin}
-            onCreate={handleCreate}
-          />
+          <LobbyPage isSubmitting={isSubmitting} onJoin={handleJoin} onCreate={handleCreate} />
         )}
         {error && <div className="error-display">{error}</div>}
-        <ToastContainer 
-          position="top-center" 
+        <ToastContainer
+          position="top-center"
           autoClose={3000}
-          hideProgressBar={true} 
+          hideProgressBar={true}
           theme="colored"
         />
       </main>

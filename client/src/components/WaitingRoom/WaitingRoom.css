@@ -111,7 +111,7 @@
 }
 
 .disabled:hover {
-  filter: brightness(80%);  
+  filter: brightness(80%);
   cursor: not-allowed;
 }
 
@@ -132,7 +132,7 @@
   content: '';
   width: 48px;
   height: 48px;
-  border: 2px solid #FFF;
+  border: 2px solid #fff;
   position: absolute;
   left: 0;
   top: 0;
@@ -151,11 +151,9 @@
   100% {
     transform: rotate(360deg);
   }
-} 
-
+}
 
 @media (max-width: 480px) {
-
   .starting-shell h2 {
     font-size: 1.2rem;
   }
@@ -167,9 +165,9 @@
   .room-code {
     font-size: 0.8rem;
     justify-content: center;
-  }   
+  }
 
   .countdown {
     font-size: 2.4rem;
   }
-}   
+}

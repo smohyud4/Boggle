@@ -1,4 +1,4 @@
-import "./Leaderboard.css";
+import './Leaderboard.css';
 
 type LeaderboardEntry = {
   playerId: string;
@@ -15,10 +15,10 @@ type LeaderBoardProps = {
 
 export default function LeaderBoard({ entries, onRefresh, onStartNewGame }: LeaderBoardProps) {
   const getLeaderboardClass = (index: number) => {
-    if (index === 0) return " --first";
-    if (index === 1) return " --second";
-    if (index === 2) return " --third";
-    return "";
+    if (index === 0) return ' --first';
+    if (index === 1) return ' --second';
+    if (index === 2) return ' --third';
+    return '';
   };
 
   return (
@@ -44,11 +44,7 @@ export default function LeaderBoard({ entries, onRefresh, onStartNewGame }: Lead
         {entries.map((entry, index) => (
           <li key={entry.playerId} className="leaderboard__row">
             <div className="left-data">
-              <span
-                className={`leaderboard__rank${getLeaderboardClass(index)}`}
-              >
-                {index + 1}
-              </span>
+              <span className={`leaderboard__rank${getLeaderboardClass(index)}`}>{index + 1}</span>
               <span className="leaderboard__name">{entry.name}</span>
             </div>
             <div className="right-data">

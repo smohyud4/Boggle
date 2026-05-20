@@ -1,5 +1,5 @@
-import type { RoundResultPlayerPayload } from "../../types/payload";
-import "./RoundResultModal.css";
+import type { RoundResultPlayerPayload } from '../../types/payload';
+import './RoundResultModal.css';
 
 type RoundResultCardProps = {
   player: RoundResultPlayerPayload;
@@ -19,9 +19,7 @@ function RoundResultCard({ player }: RoundResultCardProps) {
       <div className="result-card__section">
         <div className="result-card__section-header">
           <h4>Accepted words</h4>
-          <span className="result-card__word-count">
-            {player.acceptedWords.length}
-          </span>
+          <span className="result-card__word-count">{player.acceptedWords.length}</span>
         </div>
 
         {player.acceptedWords.length > 0 ? (

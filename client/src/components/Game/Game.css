@@ -181,7 +181,7 @@
 }
 
 .word-input::placeholder {
-   color: var(--muted-text);
+  color: var(--muted-text);
 }
 
 .muted-text {
@@ -190,8 +190,8 @@
 }
 
 .game-sidebar h3 {
-    font-size: 1rem;
-    font-weight: 600;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .score-value {
@@ -216,7 +216,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--secondary-teal);
-  text-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   animation: slideRight 1000ms ease-out forwards;
 }
 
@@ -233,13 +233,20 @@
 }
 
 @keyframes slideRight {
-  from { transform: translateY(-50%); opacity: 1; }
-  70% { opacity: 1; }
-  to { transform: translate(100%, -50%); opacity: 0; }
+  from {
+    transform: translateY(-50%);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(100%, -50%);
+    opacity: 0;
+  }
 }
 
 @media (max-width: 520px) {
-
   .word-input {
     font-size: 1rem;
   }
@@ -298,5 +305,4 @@
   .game-sidebar__panel {
     position: static;
   }
-
 }

@@ -1,17 +1,13 @@
-import CreateForm from "../CreateForm/CreateForm";
-import JoinForm from "../JoinForm/JoinForm";
-import "./LobbyPage.css";
+import CreateForm from '../CreateForm/CreateForm';
+import JoinForm from '../JoinForm/JoinForm';
+import './LobbyPage.css';
 
-type ScoringType = "default" | "equal";
+type ScoringType = 'default' | 'equal';
 
 type LobbyPageProps = {
   isSubmitting: boolean;
   onJoin: (payload: { name: string; roomCode: string }) => void;
-  onCreate: (payload: {
-    name: string;
-    rounds: number;
-    scoringType: ScoringType;
-  }) => void;
+  onCreate: (payload: { name: string; rounds: number; scoringType: ScoringType }) => void;
 };
 
 function LobbyPage({ isSubmitting, onJoin, onCreate }: LobbyPageProps) {

@@ -1,10 +1,10 @@
-import { useState } from "react";
-import type { RoundResultPayload } from "../../types/payload";
-import RoundResultCard from "./RoundResultCard";
-import "./RoundResultModal.css";
-import { socket } from "../../socket/client";
-import { SOCKET_EVENTS } from "../../socket/events";
-import LeaderBoard from "../Leaderboard/Leaderboard";
+import { useState } from 'react';
+import type { RoundResultPayload } from '../../types/payload';
+import RoundResultCard from './RoundResultCard';
+import './RoundResultModal.css';
+import { socket } from '../../socket/client';
+import { SOCKET_EVENTS } from '../../socket/events';
+import LeaderBoard from '../Leaderboard/Leaderboard';
 
 type RoundResultModalProps = {
   roundResult: RoundResultPayload;
@@ -65,9 +65,7 @@ function RoundResultModal({
       >
         <header className="result-modal__header">
           <div>
-            <p className="result-modal__eyebrow">
-              Round {roundResult.round} complete
-            </p>
+            <p className="result-modal__eyebrow">Round {roundResult.round} complete</p>
             <h2 id="round-result-title">Round Results</h2>
           </div>
         </header>
@@ -81,7 +79,7 @@ function RoundResultModal({
         <footer className="result-modal__footer">
           {hasMoreRounds && isAdmin ? (
             <button type="button" onClick={onNextRound} disabled={isAdvancing}>
-              {isAdvancing ? "Starting next round..." : "Next Round"}
+              {isAdvancing ? 'Starting next round...' : 'Next Round'}
             </button>
           ) : (
             !hasMoreRounds && (

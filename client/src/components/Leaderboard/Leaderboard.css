@@ -86,7 +86,7 @@
 }
 
 .new-game {
-border: 1px solid #b6b7bc;
+  border: 1px solid #b6b7bc;
   background: var(--primary-navy);
   color: white;
   border-radius: 16px;
@@ -115,7 +115,9 @@ border: 1px solid #b6b7bc;
 }
 
 @media (max-width: 480px) {
-  .leaderboard__list .table__header, .exit-lobby, .new-game {
+  .leaderboard__list .table__header,
+  .exit-lobby,
+  .new-game {
     font-size: 0.8rem;
   }
 

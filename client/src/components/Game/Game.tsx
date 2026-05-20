@@ -1,31 +1,31 @@
-import { useEffect, useRef, useState, type JSX } from "react";
-import { createPortal } from "react-dom";
-import Arrow, { type ArrowProps } from "../Arrow/Arrow";
-import { socket } from "../../socket/client";
-import { SOCKET_EVENTS } from "../../socket/events";
-import type { RoundStartPayload } from "../../types/payload";
-import "./Game.css";
+import { useEffect, useRef, useState, type JSX } from 'react';
+import { createPortal } from 'react-dom';
+import Arrow, { type ArrowProps } from '../Arrow/Arrow';
+import { socket } from '../../socket/client';
+import { SOCKET_EVENTS } from '../../socket/events';
+import type { RoundStartPayload } from '../../types/payload';
+import './Game.css';
 
-import { 
-  ArrowLeft, 
-  ArrowUp, 
-  ArrowRight, 
+import {
+  ArrowLeft,
+  ArrowUp,
+  ArrowRight,
   ArrowDown,
   ArrowUpRight,
   ArrowUpLeft,
   ArrowDownRight,
-  ArrowDownLeft
+  ArrowDownLeft,
 } from 'lucide-react';
 
 const arrows = {
-  left: <ArrowLeft className="arrow-icon"/>,
-  up: <ArrowUp className="arrow-icon"/>,
-  right: <ArrowRight className="arrow-icon"/>,
-  down: <ArrowDown className="arrow-icon"/>,
-  "top-right": <ArrowUpRight className="arrow-icon"/>,
-  "top-left": <ArrowUpLeft className="arrow-icon"/>,
-  "bottom-right": <ArrowDownRight className="arrow-icon"/>,
-  "bottom-left": <ArrowDownLeft className="arrow-icon"/> 
+  left: <ArrowLeft className="arrow-icon" />,
+  up: <ArrowUp className="arrow-icon" />,
+  right: <ArrowRight className="arrow-icon" />,
+  down: <ArrowDown className="arrow-icon" />,
+  'top-right': <ArrowUpRight className="arrow-icon" />,
+  'top-left': <ArrowUpLeft className="arrow-icon" />,
+  'bottom-right': <ArrowDownRight className="arrow-icon" />,
+  'bottom-left': <ArrowDownLeft className="arrow-icon" />,
 };
 
 function getArrowString(direction: keyof typeof arrows): JSX.Element {
@@ -40,12 +40,7 @@ function canSpell(board: string[], word: string) {
     grid.push(board.slice(i * n, (i + 1) * n));
   }
 
-  function dfs(
-    r: number,
-    c: number,
-    index: number,
-    visited = new Set<number>(),
-  ): boolean {
+  function dfs(r: number, c: number, index: number, visited = new Set<number>()): boolean {
     if (r < 0 || r >= n || c < 0 || c >= n) return false;
 
     const square = r * n + c;
@@ -87,28 +82,17 @@ function canSpell(board: string[], word: string) {
 
 type GameProps = RoundStartPayload;
 
-function Game({
-  roomId,
-  round,
-  totalRounds,
-  board,
-  scoringParams,
-  expiresAt,
-}: GameProps) {
-  const [word, setWord] = useState("");
+function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: GameProps) {
+  const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [currScore, setCurrScore] = useState(0);
   const [validWords, setValidWords] = useState<Set<string>>(new Set());
   const [highlighted, setHighlighted] = useState<number[]>([]);
   const [arrows, setArrows] = useState<ArrowProps[]>([]);
   const [prevIndex, setPrevIndex] = useState(-1);
-  const [secondsLeft, setSecondsLeft] = useState(() =>
-    Math.ceil((expiresAt - Date.now()) / 1000),
-  );
+  const [secondsLeft, setSecondsLeft] = useState(() => Math.ceil((expiresAt - Date.now()) / 1000));
   const [roundOver, setRoundOver] = useState(false);
-  const [scoreAnimations, setScoreAnimations] = useState<
-    { id: number; points: number }[]
-  >([]);
+  const [scoreAnimations, setScoreAnimations] = useState<{ id: number; points: number }[]>([]);
 
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
@@ -121,11 +105,11 @@ function Game({
   useEffect(() => {
     const fetchValidWords = async () => {
       try {
-        const response = await fetch("word-list.txt");
+        const response = await fetch('word-list.txt');
         const data = await response.text();
-        setValidWords(new Set(data.split("\n").map((entry) => entry.trim())));
+        setValidWords(new Set(data.split('\n').map((entry) => entry.trim())));
       } catch (error) {
-        console.error("Error fetching valid words:", error);
+        console.error('Error fetching valid words:', error);
       }
     };
 
@@ -134,10 +118,7 @@ function Game({
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      const remainingSeconds = Math.max(
-        0,
-        Math.ceil((expiresAt - Date.now()) / 1000),
-      );
+      const remainingSeconds = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
       setSecondsLeft(remainingSeconds);
 
       if (remainingSeconds === 0 && !roundSubmittedRef.current) {
@@ -147,7 +128,7 @@ function Game({
     }, 250);
 
     const resetRound = () => {
-      setWord("");
+      setWord('');
       setFoundWords([]);
       setCurrScore(0);
       setHighlighted([]);
@@ -187,8 +168,7 @@ function Game({
   };
 
   const validMove = (index: number) => {
-    if (!selectionActiveRef.current || highlighted.includes(index))
-      return false;
+    if (!selectionActiveRef.current || highlighted.includes(index)) return false;
 
     const row = Math.floor(index / ROWS);
     const prevRow = Math.floor(prevIndex / ROWS);
@@ -218,21 +198,21 @@ function Game({
     let direction: JSX.Element;
 
     if (to === from + 1) {
-      direction = getArrowString("right");
+      direction = getArrowString('right');
     } else if (to === from - 1) {
-      direction = getArrowString("left");
+      direction = getArrowString('left');
     } else if (to === from + COLS) {
-      direction = getArrowString("down");
+      direction = getArrowString('down');
     } else if (to === from - COLS) {
-      direction = getArrowString("up");
+      direction = getArrowString('up');
     } else if (to === from + COLS + 1) {
-      direction = getArrowString("bottom-right");
+      direction = getArrowString('bottom-right');
     } else if (to === from + COLS - 1) {
-      direction = getArrowString("bottom-left");
+      direction = getArrowString('bottom-left');
     } else if (to === from - COLS + 1) {
-      direction = getArrowString("top-right");
+      direction = getArrowString('top-right');
     } else if (to === from - COLS - 1) {
-      direction = getArrowString("top-left");
+      direction = getArrowString('top-left');
     }
 
     setArrows((prev) => [...prev, { direction, top, left }]);
@@ -255,18 +235,14 @@ function Game({
   };
 
   const isValidWord = (word: string) => {
-    return (
-      !foundWords.includes(word) &&
-      validWords.has(word) &&
-      canSpell(board, word)
-    );
+    return !foundWords.includes(word) && validWords.has(word) && canSpell(board, word);
   };
 
   const handleCheckWord = () => {
     if (!isValidWord(word)) {
-      inputRef.current?.classList.add("invalid");
+      inputRef.current?.classList.add('invalid');
       setTimeout(() => {
-        inputRef.current?.classList.remove("invalid");
+        inputRef.current?.classList.remove('invalid');
       }, 1000);
       return;
     }
@@ -276,7 +252,7 @@ function Game({
     setFoundWords((prev) => [word, ...prev]);
     setCurrScore((prev) => prev + score);
     triggerScoreAnimation(score);
-    setWord("");
+    setWord('');
     setHighlighted([]);
     setPrevIndex(-1);
     setArrows([]);
@@ -294,7 +270,7 @@ function Game({
       triggerScoreAnimation(score);
     }
 
-    setWord("");
+    setWord('');
     setHighlighted([]);
     setPrevIndex(-1);
     setArrows([]);
@@ -317,11 +293,7 @@ function Game({
 
       const rect = el.getBoundingClientRect();
 
-      const containsPoint =
-        x >= rect.left &&
-        x <= rect.right &&
-        y >= rect.top &&
-        y <= rect.bottom;
+      const containsPoint = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 
       if (containsPoint) {
         continueSelection(board[index], index);
@@ -331,7 +303,7 @@ function Game({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleCheckWord();
     }
   };
@@ -351,10 +323,12 @@ function Game({
                 value={word}
                 onChange={(event) => setWord(event.target.value.toLowerCase())}
                 onKeyDown={handleKeyDown}
-                placeholder={scoreAnimations.length > 0 ? "Nice!" : "Build a word"}
+                placeholder={scoreAnimations.length > 0 ? 'Nice!' : 'Build a word'}
               />
               {scoreAnimations.map((anim) => (
-                <div key={anim.id} className="points-fly">+{anim.points}</div>
+                <div key={anim.id} className="points-fly">
+                  +{anim.points}
+                </div>
               ))}
             </div>
           </div>
@@ -362,18 +336,14 @@ function Game({
         </div>
 
         <div className="game-grid-container">
-          <div 
-            className="letter-grid" 
-            onPointerLeave={endSelection}
-            onTouchMove={handleTouchMove}
-          >
+          <div className="letter-grid" onPointerLeave={endSelection} onTouchMove={handleTouchMove}>
             {board.map((letter, index) => (
               <div key={index}>
                 <span
                   ref={(el) => {
                     letterRefs.current[index] = el;
                   }}
-                  className={`letter ${highlighted.includes(index) ? "active" : ""}`}
+                  className={`letter ${highlighted.includes(index) ? 'active' : ''}`}
                   onPointerDown={() => startSelection(letter, index)}
                   onPointerEnter={() => continueSelection(letter, index)}
                   onPointerUp={endSelection}
@@ -404,16 +374,15 @@ function Game({
         </div>
       </div>
 
-      {roundOver && <div className="backdrop"><p>Waiting on Server...</p></div>}
+      {roundOver && (
+        <div className="backdrop">
+          <p>Waiting on Server...</p>
+        </div>
+      )}
 
       {createPortal(
         arrows.map((arrow, index) => (
-          <Arrow
-            key={index}
-            direction={arrow.direction}
-            top={arrow.top}
-            left={arrow.left}
-          />
+          <Arrow key={index} direction={arrow.direction} top={arrow.top} left={arrow.left} />
         )),
         document.body,
       )}

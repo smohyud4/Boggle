@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { socket } from "../../socket/client";
-import { SOCKET_EVENTS } from "../../socket/events";
-import { Flip, ToastContainer, toast } from "react-toastify";
-import { Check, Copy, Star } from "lucide-react";
-import type { LobbyPlayer } from "../../types/payload";
-import "./WaitingRoom.css";
+import { useEffect, useState } from 'react';
+import { socket } from '../../socket/client';
+import { SOCKET_EVENTS } from '../../socket/events';
+import { Flip, ToastContainer, toast } from 'react-toastify';
+import { Check, Copy, Star } from 'lucide-react';
+import type { LobbyPlayer } from '../../types/payload';
+import './WaitingRoom.css';
 
 type WaitingRoomProps = {
   roomId: string;
@@ -19,9 +19,9 @@ function ToastComponent() {
   return (
     <div
       style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "5px",
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px',
       }}
     >
       <span>Code Copied</span>
@@ -40,11 +40,11 @@ function WaitingRoom({
 }: WaitingRoomProps) {
   const [countdown, setCountdown] = useState(false);
   const notify = () => {
-    toast(ToastComponent, { 
-      className: 'toast-background', 
+    toast(ToastComponent, {
+      className: 'toast-background',
       position: 'bottom-center',
       pauseOnHover: false,
-      transition: Flip
+      transition: Flip,
     });
   };
 
@@ -78,11 +78,13 @@ function WaitingRoom({
       <div className="code-container">
         <div className="room-code">
           Room Code: <span>{roomId}</span>
-          <button onClick={() => {
-            notify();
-            navigator.clipboard.writeText(roomId);
-          }}>
-            <Copy className="copy-icon" /> 
+          <button
+            onClick={() => {
+              notify();
+              navigator.clipboard.writeText(roomId);
+            }}
+          >
+            <Copy className="copy-icon" />
           </button>
         </div>
       </div>
@@ -102,10 +104,10 @@ function WaitingRoom({
           <button
             type="button"
             onClick={onStartGame}
-            className={`start-game ${!canStart || isSubmitting ? "disabled" : ""}`}
+            className={`start-game ${!canStart || isSubmitting ? 'disabled' : ''}`}
             disabled={!canStart || isSubmitting}
           >
-            {isSubmitting ? "Pending..." : "Start Game"}
+            {isSubmitting ? 'Pending...' : 'Start Game'}
           </button>
         ) : (
           <p className="waiting-text">Waiting for admin to start...</p>
@@ -116,11 +118,7 @@ function WaitingRoom({
         ) : null}
       </div>
 
-      <ToastContainer 
-        autoClose={3000}
-        hideProgressBar={true} 
-        theme="colored"
-      />
+      <ToastContainer autoClose={3000} hideProgressBar={true} theme="colored" />
     </section>
   );
 }
