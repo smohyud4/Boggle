@@ -190,8 +190,8 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
     const fromRect = fromElement.getBoundingClientRect();
     const toRect = toElement.getBoundingClientRect();
 
-    const midX = (fromRect.left + (toRect.left + toRect.width)) / 2;
-    const midY = (fromRect.top + fromRect.height + toRect.top) / 2;
+    const midX = (fromRect.left + toRect.right) / 2;
+    const midY = (fromRect.top + toRect.bottom) / 2;
 
     const left = `${midX}px`;
     const top = `${midY}px`;
