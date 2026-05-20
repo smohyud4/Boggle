@@ -42,7 +42,7 @@ export type StartGamePayload = {
 
 export type SubmitWordsPayload = {
   roomId?: string;
-  words?: unknown;
+  words?: string[];
 };
 
 export type LeaveRoomPayload = {
