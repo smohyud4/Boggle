@@ -5,21 +5,22 @@ import './LobbyPage.css';
 type ScoringType = 'default' | 'equal';
 
 type LobbyPageProps = {
-  isSubmitting: boolean;
+  isJoinSubmitting: boolean;
+  isCreateSubmitting: boolean;
   onJoin: (payload: { name: string; roomCode: string }) => void;
   onCreate: (payload: { name: string; rounds: number; scoringType: ScoringType }) => void;
 };
 
-function LobbyPage({ isSubmitting, onJoin, onCreate }: LobbyPageProps) {
+function LobbyPage({ isJoinSubmitting, isCreateSubmitting, onJoin, onCreate }: LobbyPageProps) {
   return (
     <section className="lobby-shell">
       <div className="forms-row">
         <div className="form-slot">
-          <JoinForm isSubmitting={isSubmitting} onSubmit={onJoin} />
+          <JoinForm isSubmitting={isJoinSubmitting} onSubmit={onJoin} />
         </div>
 
         <div className="form-slot">
-          <CreateForm isSubmitting={isSubmitting} onSubmit={onCreate} />
+          <CreateForm isSubmitting={isCreateSubmitting} onSubmit={onCreate} />
         </div>
       </div>
     </section>

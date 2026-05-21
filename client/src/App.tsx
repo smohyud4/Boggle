@@ -30,10 +30,14 @@ function App() {
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [canStart, setCanStart] = useState(false);
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [gameInfo, setGameInfo] = useState<RoundStartPayload | null>(null);
   const [roundResult, setRoundResult] = useState<RoundResultPayload | null>(null);
   const [isAdvancingRound, setIsAdvancingRound] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState({
+    join: false,
+    create: false,
+    startGame: false,
+  });
 
   const notify = (message: string) => toast.info(message);
 
@@ -43,7 +47,11 @@ function App() {
       setIsAdmin(payload.isAdmin);
       setIsWaitingRoom(true);
       setError('');
-      setIsSubmitting(false);
+      setIsSubmitting({
+        join: false,
+        create: false,
+        startGame: false,
+      });
     };
 
     const onLobbyUpdated = (payload: LobbyUpdatedPayload) => {
@@ -65,12 +73,15 @@ function App() {
 
     const onRoundResult = (payload: RoundResultPayload) => {
       setRoundResult(payload);
-      setIsSubmitting(false);
       setIsAdvancingRound(false);
     };
 
     const onGameOver = () => {
-      setIsSubmitting(false);
+      setIsSubmitting({
+        join: false,
+        create: false,
+        startGame: false,
+      });
       setIsAdvancingRound(false);
     };
 
@@ -80,7 +91,11 @@ function App() {
 
     const onError = (payload: ErrorPayload) => {
       setError(payload.message || 'Something went wrong.');
-      setIsSubmitting(false);
+      setIsSubmitting({
+        join: false,
+        create: false,
+        startGame: false,
+      });
       setIsAdvancingRound(false);
     };
 
@@ -113,7 +128,7 @@ function App() {
     }
 
     setError('');
-    setIsSubmitting(true);
+    setIsSubmitting((prev) => ({ ...prev, join: true }));
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
       roomId: trimmedRoomCode,
@@ -146,7 +161,7 @@ function App() {
     const createdRoomCode = generateRoomCode();
 
     setError('');
-    setIsSubmitting(true);
+    setIsSubmitting((prev) => ({ ...prev, create: true }));
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
       roomId: createdRoomCode,
@@ -161,7 +176,7 @@ function App() {
     if (!isAdmin || !roomId) return;
 
     setError('');
-    setIsSubmitting(true);
+    setIsSubmitting((prev) => ({ ...prev, startGame: true }));
     socket.emit(SOCKET_EVENTS.START_GAME, { roomId });
   };
 
@@ -212,11 +227,16 @@ function App() {
             players={players}
             isAdmin={isAdmin}
             canStart={canStart}
-            isSubmitting={isSubmitting}
+            isSubmitting={isSubmitting.startGame}
             onStartGame={handleStartGame}
           />
         ) : (
-          <LobbyPage isSubmitting={isSubmitting} onJoin={handleJoin} onCreate={handleCreate} />
+          <LobbyPage
+            isJoinSubmitting={isSubmitting.join}
+            isCreateSubmitting={isSubmitting.create}
+            onJoin={handleJoin}
+            onCreate={handleCreate}
+          />
         )}
         {error && <div className="error-display">{error}</div>}
         <ToastContainer
