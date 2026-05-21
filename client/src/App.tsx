@@ -239,13 +239,13 @@ function App() {
           />
         )}
         {error && <div className="error-display">{error}</div>}
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={true}
-          theme="colored"
-        />
       </main>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={true}
+        theme="colored"
+      />
     </>
   );
 }
