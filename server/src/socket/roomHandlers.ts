@@ -47,6 +47,15 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
     scoringParams: game.scoringParams,
     expiresAt: game.roundExpiresAt,
   });
+
+  setTimeout(
+    () => {
+      const currentGame = games.get(roomId);
+      if (!currentGame || currentGame.round !== roundNumber) return;
+      settleRound(io, roomId, 'timer_expired');
+    },
+    (GAME_CONFIG.ROUND_SECONDS / 3) * 1000,
+  );
 }
 
 function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_submitted'): void {
@@ -326,10 +335,20 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     startRound(io, roomId, game.round);
   });
 
-  socket.on(EVENTS.SUBMIT_WORDS, (payload: SubmitWordsPayload = {}) => {
-    const { roomId, words } = payload;
+  socket.on(EVENTS.SUBMIT_WORDS, (payload: SubmitWordsPayload) => {
+    const { roomId, words, timeStamp } = payload;
     if (!roomId || typeof roomId !== 'string') {
       emitError(socket, 'Invalid room id.');
+      return;
+    }
+
+    if (!timeStamp || typeof timeStamp !== 'number') {
+      emitError(socket, 'Invalid timestamp.');
+      return;
+    }
+
+    if (!words || !Array.isArray(words)) {
+      emitError(socket, 'Invalid words.');
       return;
     }
 
@@ -350,8 +369,9 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    if (game.hasSubmitted(socket.id, game.round)) {
-      emitError(socket, 'Words already submitted for this round.', {
+    const expiryTime = game.roundExpiresAt ?? 0;
+    if (timeStamp > expiryTime + 1000) {
+      emitError(socket, 'Could not save your last word in time.', {
         roomId,
         round: game.round,
       });
@@ -359,10 +379,6 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     game.addWords(socket.id, normalizeWords(words), game.round);
-
-    if (game.allActivePlayersSubmitted(game.round)) {
-      settleRound(io, roomId, 'all_submitted');
-    }
   });
 
   socket.on(EVENTS.LEAVE_ROOM, (payload: LeaveRoomPayload = {}) => {

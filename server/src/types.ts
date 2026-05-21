@@ -21,13 +21,6 @@ export type RoundResult = {
   points: number;
 };
 
-export type LeaderboardEntry = {
-  playerId: string;
-  name: string;
-  totalScore: number;
-  place: number;
-};
-
 export type JoinRoomPayload = {
   roomId: string;
   playerName: string;
@@ -41,8 +34,9 @@ export type StartGamePayload = {
 };
 
 export type SubmitWordsPayload = {
-  roomId?: string;
+  roomId: string;
   words?: string[];
+  timeStamp: number;
 };
 
 export type LeaveRoomPayload = {

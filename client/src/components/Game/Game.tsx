@@ -123,6 +123,7 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
 
       if (remainingSeconds === 0 && !roundSubmittedRef.current) {
         setRoundOver(true);
+        roundSubmittedRef.current = true;
         window.clearInterval(timer);
       }
     }, 250);
@@ -142,16 +143,6 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
     resetRound();
     return () => window.clearInterval(timer);
   }, [expiresAt]);
-
-  useEffect(() => {
-    if (roundOver && !roundSubmittedRef.current) {
-      roundSubmittedRef.current = true;
-      socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
-        roomId,
-        words: foundWords,
-      });
-    }
-  }, [roundOver, roomId, foundWords]);
 
   const triggerScoreAnimation = (points: number) => {
     const id = Date.now() + Math.floor(Math.random() * 1000);
@@ -249,6 +240,12 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
 
     const score = getWordScore(word);
 
+    socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
+      roomId,
+      words: [word],
+      timeStamp: Date.now(),
+    });
+
     setFoundWords((prev) => [word, ...prev]);
     setCurrScore((prev) => prev + score);
     triggerScoreAnimation(score);
@@ -265,6 +262,13 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
 
     if (validWords.has(word) && !foundWords.includes(word)) {
       const score = getWordScore(word);
+
+      socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
+        roomId,
+        words: [word],
+        timeStamp: Date.now(),
+      });
+
       setFoundWords((prev) => [word, ...prev]);
       setCurrScore((prev) => prev + score);
       triggerScoreAnimation(score);

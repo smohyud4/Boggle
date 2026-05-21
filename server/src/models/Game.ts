@@ -1,5 +1,5 @@
 import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
-import type { GameInitializer, GameStatus, LeaderboardEntry, RoundResult } from '../types.js';
+import type { GameInitializer, GameStatus, RoundResult } from '../types.js';
 import { generateBoards } from '../utils/game.ts';
 import { Player } from './Player.js';
 
@@ -11,7 +11,7 @@ export class Game {
   scoringParams: Record<number, number>;
   boards: string[][];
   status: GameStatus;
-  roundSubmissions: Map<number, Map<string, string[]>>;
+  roundSubmissions: Map<number, Map<string, Set<string>>>;
   roundResults: Map<number, Map<string, RoundResult>>;
   roundExpiresAt: number | null;
 
@@ -80,12 +80,13 @@ export class Game {
     const roundSubmissions = this.roundSubmissions.get(round);
     if (!roundSubmissions) return;
 
-    roundSubmissions.set(playerId, words);
-  }
+    let currWords = roundSubmissions.get(playerId);
+    if (!currWords) {
+      currWords = new Set<string>();
+      roundSubmissions.set(playerId, currWords);
+    }
 
-  hasSubmitted(playerId: string, round = this.round): boolean {
-    const roundSubmissions = this.roundSubmissions.get(round);
-    return roundSubmissions ? roundSubmissions.has(playerId) : false;
+    words.forEach((word) => currWords.add(word));
   }
 
   allActivePlayersSubmitted(round = this.round): boolean {
@@ -126,7 +127,7 @@ export class Game {
       }
 
       results.set(playerId, {
-        submittedWords: words,
+        submittedWords: Array.from(words),
         acceptedWords: accepted,
         points: score,
       });
@@ -176,30 +177,5 @@ export class Game {
       if (playerResult) total += playerResult.acceptedWords.length;
     }
     return total;
-  }
-
-  getFinalLeaderboard(): LeaderboardEntry[] {
-    const ranked = this.players
-      .map((player) => ({
-        playerId: player.id,
-        name: player.name,
-        totalScore: this.getTotalScoreById(player.id),
-      }))
-      .sort((a, b) => b.totalScore - a.totalScore || a.name.localeCompare(b.name));
-
-    let placement = 0;
-    let previousScore: number | null = null;
-
-    return ranked.map((entry, index) => {
-      if (entry.totalScore !== previousScore) {
-        placement = index + 1;
-        previousScore = entry.totalScore;
-      }
-
-      return {
-        ...entry,
-        place: placement,
-      };
-    });
   }
 }
