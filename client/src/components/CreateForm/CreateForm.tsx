@@ -9,6 +9,8 @@ type CreateFormProps = {
   onSubmit: (payload: { name: string; rounds: number; scoringType: ScoringType }) => void;
 };
 
+const nameRegex = /^[a-zA-Z0-9_]+$/;
+
 function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
   const [name, setName] = useState('');
   const [rounds, setRounds] = useState('3');
@@ -31,7 +33,12 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
         <span>Player name</span>
         <input
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event) => {
+            const newValue = event.target.value;
+            if (nameRegex.test(newValue)) {
+              setName(newValue);
+            }
+          }}
           placeholder="Enter your name"
           maxLength={24}
           required

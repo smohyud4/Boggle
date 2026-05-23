@@ -41,7 +41,7 @@ function WaitingRoom({
   const [countdown, setCountdown] = useState(false);
   const notify = () => {
     toast(<ToastComponent />, {
-      className: 'toast-background',
+      className: 'copy-toast',
       position: 'bottom-center',
       autoClose: 2000,
       pauseOnHover: false,
@@ -64,12 +64,12 @@ function WaitingRoom({
   if (countdown) {
     return (
       <section className="starting-shell">
-        <h2>Game is Starting...</h2>
         <div className="loader-container">
           {Array.from({ length: 16 }).map((_, index) => (
             <span key={index} className="loader" />
           ))}
         </div>
+        <h2>Game is Starting...</h2>
       </section>
     );
   }

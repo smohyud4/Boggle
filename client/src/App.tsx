@@ -3,6 +3,7 @@ import LobbyPage from './components/LobbyPage/LobbyPage';
 import WaitingRoom from './components/WaitingRoom/WaitingRoom';
 import Game from './components/Game/Game';
 import RoundResultModal from './components/RoundResultModal/RoundResultModal';
+import ErrorModal from './components/ErrorModal/ErrorModal';
 import { socket } from './socket/client';
 import { SOCKET_EVENTS } from './socket/events';
 import type {
@@ -30,6 +31,7 @@ function App() {
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [canStart, setCanStart] = useState(false);
   const [error, setError] = useState('');
+  const [showServerErrorModal, setShowServerErrorModal] = useState(false);
   const [gameInfo, setGameInfo] = useState<RoundStartPayload | null>(null);
   const [roundResult, setRoundResult] = useState<RoundResultPayload | null>(null);
   const [isAdvancingRound, setIsAdvancingRound] = useState(false);
@@ -38,8 +40,6 @@ function App() {
     create: false,
     startGame: false,
   });
-
-  const notify = (message: string) => toast.info(message);
 
   useEffect(() => {
     const onRoomJoined = (payload: RoomJoinedPayload) => {
@@ -86,17 +86,35 @@ function App() {
     };
 
     const onPlayerLeft = ({ name, reason }: PlayerLeftPayload) => {
-      notify(`${name} has ${reason === 'left' ? 'left the room' : 'disconnected'}.`);
+      toast.info(`${name} has ${reason === 'left' ? 'left the room' : 'disconnected'}.`);
     };
 
     const onError = (payload: ErrorPayload) => {
-      setError(payload.message || 'Something went wrong.');
+      if (payload?.type === 'form_error') {
+        setError(payload.message || 'Something went wrong.');
+        setIsSubmitting({
+          join: false,
+          create: false,
+          startGame: false,
+        });
+        setIsAdvancingRound(false);
+        return;
+      }
+
+      setShowServerErrorModal(true);
       setIsSubmitting({
         join: false,
         create: false,
         startGame: false,
       });
       setIsAdvancingRound(false);
+    };
+
+    const onWarning = (payload: ErrorPayload) => {
+      toast.warning(payload.message, {
+        position: 'bottom-right',
+        hideProgressBar: false,
+      });
     };
 
     socket.on(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
@@ -106,6 +124,7 @@ function App() {
     socket.on(SOCKET_EVENTS.GAME_OVER, onGameOver);
     socket.on(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
     socket.on(SOCKET_EVENTS.ERROR_EVENT, onError);
+    socket.on(SOCKET_EVENTS.WARNING_EVENT, onWarning);
 
     return () => {
       socket.off(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
@@ -115,6 +134,7 @@ function App() {
       socket.off(SOCKET_EVENTS.GAME_OVER, onGameOver);
       socket.off(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
       socket.off(SOCKET_EVENTS.ERROR_EVENT, onError);
+      socket.off(SOCKET_EVENTS.WARNING_EVENT, onWarning);
     };
   }, []);
 
@@ -246,6 +266,7 @@ function App() {
         hideProgressBar={true}
         theme="colored"
       />
+      {showServerErrorModal ? <ErrorModal onRefresh={() => window.location.reload()} /> : null}
     </>
   );
 }

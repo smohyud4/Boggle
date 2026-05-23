@@ -7,6 +7,8 @@ type JoinFormProps = {
   onSubmit: (payload: { name: string; roomCode: string }) => void;
 };
 
+const nameRegex = /^[a-zA-Z0-9_]+$/;
+
 function JoinForm({ isSubmitting, onSubmit }: JoinFormProps) {
   const [name, setName] = useState('');
   const [roomCode, setRoomCode] = useState('');
@@ -23,7 +25,12 @@ function JoinForm({ isSubmitting, onSubmit }: JoinFormProps) {
         <span>Player name</span>
         <input
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event) => {
+            const newValue = event.target.value;
+            if (nameRegex.test(newValue)) {
+              setName(newValue);
+            }
+          }}
           placeholder="Enter your name"
           maxLength={24}
           required

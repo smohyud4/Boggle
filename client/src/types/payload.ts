@@ -20,8 +20,8 @@ export type LobbyUpdatedPayload = {
 };
 
 export type ErrorPayload = {
-  message?: string;
-};
+  message: string;
+} & Record<string, unknown>;
 
 export type RoundStartPayload = {
   roomId: string;

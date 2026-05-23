@@ -306,6 +306,13 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
     }
   };
 
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value.toLowerCase();
+    if (newValue.length === 0 || /^[a-zA-Z]+$/.test(newValue)) {
+      setWord(newValue);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleCheckWord();
@@ -325,8 +332,9 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
                 ref={inputRef}
                 className="word-input"
                 value={word}
-                onChange={(event) => setWord(event.target.value.toLowerCase())}
+                onChange={handleOnChange}
                 onKeyDown={handleKeyDown}
+                maxLength={25}
                 placeholder={scoreAnimations.length > 0 ? 'Nice!' : 'Build a word'}
               />
               {scoreAnimations.map((anim) => (

@@ -13,4 +13,5 @@ export const SOCKET_EVENTS = {
   GAME_CANCELLED: 'game_cancelled',
   PLAYER_LEFT: 'player_left',
   ERROR_EVENT: 'error_event',
+  WARNING_EVENT: 'warning_event',
 } as const;

@@ -1,0 +1,50 @@
+.error-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.error-modal {
+  background: var(--dark-cream);
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+
+.error-modal-icon {
+  display: flex;
+  color: #ef4444;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.error-modal-message {
+  font-size: 16px;
+  margin-bottom: 18px;
+}
+
+.error-modal-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.error-modal-button {
+  background: var(--primary-navy);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.error-modal-button:hover {
+  filter: brightness(0.95);
+}

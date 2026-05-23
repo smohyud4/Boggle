@@ -23,7 +23,7 @@
   border-radius: 5px;
 }
 
-.toast-background {
+.copy-toast {
   display: flex;
   justify-content: center;
   background-color: var(--primary-navy) !important;
