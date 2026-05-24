@@ -31,6 +31,8 @@ function App() {
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [canStart, setCanStart] = useState(false);
   const [error, setError] = useState('');
+  const [isWaitingOnGame, setIsWaitingOnGame] = useState(false);
+  const [totalRounds, setTotalRounds] = useState(0);
   const [showServerErrorModal, setShowServerErrorModal] = useState(false);
   const [gameInfo, setGameInfo] = useState<RoundStartPayload | null>(null);
   const [roundResult, setRoundResult] = useState<RoundResultPayload | null>(null);
@@ -45,6 +47,8 @@ function App() {
     const onRoomJoined = (payload: RoomJoinedPayload) => {
       setRoomId(payload.roomId);
       setIsAdmin(payload.isAdmin);
+      setIsWaitingOnGame(payload.waitingOnGame);
+      setTotalRounds(payload.totalRounds);
       setIsWaitingRoom(true);
       setError('');
       setIsSubmitting({
@@ -74,6 +78,7 @@ function App() {
     const onRoundResult = (payload: RoundResultPayload) => {
       setRoundResult(payload);
       setIsAdvancingRound(false);
+      setIsWaitingOnGame(false);
     };
 
     const onGameOver = () => {
@@ -229,17 +234,6 @@ function App() {
               scoringParams={gameInfo.scoringParams}
               expiresAt={gameInfo.expiresAt}
             />
-
-            {roundResult !== null ? (
-              <RoundResultModal
-                roundResult={roundResult}
-                roomId={roomId}
-                totalRounds={gameInfo.totalRounds}
-                isAdmin={isAdmin}
-                isAdvancing={isAdvancingRound}
-                onNextRound={handleNextRound}
-              />
-            ) : null}
           </>
         ) : isWaitingRoom ? (
           <WaitingRoom
@@ -248,6 +242,7 @@ function App() {
             isAdmin={isAdmin}
             canStart={canStart}
             isSubmitting={isSubmitting.startGame}
+            isGameInProgress={isWaitingOnGame}
             onStartGame={handleStartGame}
           />
         ) : (
@@ -267,6 +262,16 @@ function App() {
         theme="colored"
       />
       {showServerErrorModal ? <ErrorModal onRefresh={() => window.location.reload()} /> : null}
+      {roundResult !== null ? (
+        <RoundResultModal
+          roundResult={roundResult}
+          roomId={roomId}
+          totalRounds={totalRounds}
+          isAdmin={isAdmin}
+          isAdvancing={isAdvancingRound}
+          onNextRound={handleNextRound}
+        />
+      ) : null}
     </>
   );
 }

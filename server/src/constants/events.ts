@@ -17,4 +17,6 @@ export const EVENTS = {
   GAME_CANCELLED: 'game_cancelled',
   PLAYER_LEFT: 'player_left',
   ERROR: 'error_event',
+  WARNING: 'warning_event',
+  INFO: 'info_event',
 } as const;

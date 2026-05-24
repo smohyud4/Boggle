@@ -12,6 +12,7 @@ type WaitingRoomProps = {
   isAdmin: boolean;
   canStart: boolean;
   isSubmitting: boolean;
+  isGameInProgress: boolean;
   onStartGame: () => void;
 };
 
@@ -36,6 +37,7 @@ function WaitingRoom({
   isAdmin,
   canStart,
   isSubmitting,
+  isGameInProgress,
   onStartGame,
 }: WaitingRoomProps) {
   const [countdown, setCountdown] = useState(false);
@@ -116,7 +118,11 @@ function WaitingRoom({
             {isSubmitting ? 'Pending...' : 'Start Game'}
           </button>
         ) : (
-          <p className="waiting-text">Waiting for admin to start...</p>
+          <p className="waiting-text">
+            {isGameInProgress
+              ? 'Game is in-progress. Waiting for the next round...'
+              : 'Waiting for admin to start...'}
+          </p>
         )}
 
         {isAdmin && !canStart ? (

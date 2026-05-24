@@ -25,8 +25,8 @@ export default function LeaderBoard({ entries, onRefresh, onStartNewGame }: Lead
     <section className="leaderboard">
       <header className="leaderboard__header">
         <div>
-          <p className="result-modal__eyebrow">Final ranking</p>
-          <h3>LeaderBoard</h3>
+          <p className="result-modal__eyebrow">Final Ranking</p>
+          <h3>Leaderboard</h3>
         </div>
       </header>
 

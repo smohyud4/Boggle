@@ -39,6 +39,10 @@ export class Game {
     this.players = players;
   }
 
+  addPlayer(player: Player): void {
+    this.players.push(player);
+  }
+
   removePlayerById(playerId: string): boolean {
     const previousLength = this.players.length;
     this.players = this.players.filter((player) => player.id !== playerId);

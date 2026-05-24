@@ -18,8 +18,61 @@ import type {
   SubmitWordsPayload,
 } from '../types.js';
 
-function emitError(socket: Socket, message: string, details: Record<string, unknown> = {}): void {
-  socket.emit(EVENTS.ERROR, { message, ...details });
+function broadCastError(
+  io: Server,
+  roomId: string,
+  message: string,
+  details?: Record<string, unknown>,
+): void {
+  io.to(roomId).emit(EVENTS.ERROR, {
+    message,
+    ...details,
+  });
+}
+
+function broadcastInfo(
+  io: Server,
+  roomId: string,
+  message: string,
+  details?: Record<string, unknown>,
+): void {
+  io.to(roomId).emit(EVENTS.INFO, {
+    message,
+    ...details,
+  });
+}
+
+function broadcastWarning(
+  io: Server,
+  roomId: string,
+  message: string,
+  details?: Record<string, unknown>,
+): void {
+  io.to(roomId).emit(EVENTS.WARNING, {
+    message,
+    ...details,
+  });
+}
+
+function emitError(socket: Socket, message: string, details?: Record<string, unknown>): void {
+  socket.emit(EVENTS.ERROR, {
+    message,
+    ...details,
+  });
+}
+
+function emitInfo(socket: Socket, message: string, details?: Record<string, unknown>): void {
+  socket.emit(EVENTS.INFO, {
+    message,
+    ...details,
+  });
+}
+
+function emitWarning(socket: Socket, message: string, details?: Record<string, unknown>): void {
+  socket.emit(EVENTS.WARNING, {
+    message,
+    ...details,
+  });
 }
 
 function broadcastLobby(io: Server, roomId: string): void {
@@ -32,7 +85,10 @@ function broadcastLobby(io: Server, roomId: string): void {
 
 function startRound(io: Server, roomId: string, roundNumber: number): void {
   const game = games.get(roomId);
-  if (!game) return;
+  if (!game) {
+    broadCastError(io, roomId, 'Game not found.', { roomId });
+    return;
+  }
 
   game.round = roundNumber;
   game.initializeRound(roundNumber);
@@ -60,7 +116,10 @@ function startRound(io: Server, roomId: string, roundNumber: number): void {
 
 function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_submitted'): void {
   const game = games.get(roomId);
-  if (!game || game.status !== GAME_STATUS.IN_PROGRESS) return;
+  if (!game || game.status !== GAME_STATUS.IN_PROGRESS) {
+    broadCastError(io, roomId, 'Game not found.', { roomId });
+    return;
+  }
 
   const round = game.round;
   const finalRound = round >= game.totalRounds;
@@ -162,24 +221,24 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     const { roomId, playerName, create, totalRounds, scoringParams } = payload;
 
     if (!roomId || typeof roomId !== 'string') {
-      emitError(socket, 'Invalid room id.');
+      emitError(socket, 'Invalid room id.', { type: 'form_error' });
       return;
     }
 
     if (!playerName || typeof playerName !== 'string') {
-      emitError(socket, 'Player name is required.');
+      emitError(socket, 'Player name is required.', { type: 'form_error' });
       return;
     }
 
     const normalizedRoomId = roomId.trim();
     const normalizedName = playerName.trim();
     if (!normalizedRoomId || !normalizedName) {
-      emitError(socket, 'Room id and player name cannot be empty.');
+      emitError(socket, 'Room id and player name cannot be empty.', { type: 'form_error' });
       return;
     }
 
     if (socketRoomMap.has(socket.id)) {
-      emitError(socket, 'Socket is already in a room.');
+      emitError(socket, 'You are already in a room.', { type: 'form_error' });
       return;
     }
 
@@ -187,7 +246,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     let game = games.get(normalizedRoomId);
 
     if (!create && (!waitingRoom || !game)) {
-      emitError(socket, 'Room not found.', { roomId: normalizedRoomId });
+      emitError(socket, 'Room not found.', { type: 'form_error' });
       return;
     }
 
@@ -205,13 +264,8 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       games.set(normalizedRoomId, game);
     }
 
-    if (game.status === GAME_STATUS.IN_PROGRESS) {
-      emitError(socket, 'Game already in progress.', { roomId: normalizedRoomId });
-      return;
-    }
-
     if (waitingRoom.size >= GAME_CONFIG.MAX_PLAYERS) {
-      emitError(socket, 'Room is full.', { roomId: normalizedRoomId });
+      emitError(socket, 'Room is full.', { type: 'form_error' });
       return;
     }
 
@@ -220,7 +274,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     );
 
     if (duplicateName) {
-      emitError(socket, 'Player name already used in this room.', { roomId: normalizedRoomId });
+      emitError(socket, 'Player name already used in this room.', { type: 'form_error' });
       return;
     }
 
@@ -231,7 +285,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     });
 
     waitingRoom.set(socket.id, player);
-    game.setPlayers(Array.from(waitingRoom.values()));
+    game.addPlayer(player);
 
     socket.join(normalizedRoomId);
     socketRoomMap.set(socket.id, normalizedRoomId);
@@ -240,6 +294,8 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       roomId: normalizedRoomId,
       playerId: player.id,
       isAdmin: player.isAdmin,
+      waitingOnGame: game.status === GAME_STATUS.IN_PROGRESS,
+      totalRounds: game.totalRounds,
     });
 
     broadcastLobby(io, normalizedRoomId);
@@ -260,18 +316,18 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     if (game.status !== GAME_STATUS.LOBBY) {
-      emitError(socket, 'Game cannot be started in current state.', { roomId });
+      emitError(socket, 'Game cannot be started in current state.', { type: 'form_error' });
       return;
     }
 
     const starter = waitingRoom.get(socket.id);
     if (!starter || !starter.isAdmin) {
-      emitError(socket, 'Only admin can start the game.', { roomId });
+      emitError(socket, 'Only admin can start the game.', { type: 'form_error' });
       return;
     }
 
     if (waitingRoom.size < GAME_CONFIG.MIN_PLAYERS_TO_START) {
-      emitError(socket, 'Not enough players to start.', { roomId });
+      emitError(socket, 'Not enough players to start.', { type: 'form_error' });
       return;
     }
 
@@ -294,7 +350,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     const game = games.get(roomId);
     if (!game) {
-      emitError(socket, 'Room not found.', { roomId });
+      broadCastError(io, roomId, 'Room not found.');
       return;
     }
 
@@ -322,12 +378,12 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     const game = games.get(roomId);
     if (!game) {
-      emitError(socket, 'Room not found.', { roomId });
+      broadCastError(io, roomId, 'Room not found.');
       return;
     }
 
     if (game.status !== GAME_STATUS.COMPLETED) {
-      emitError(socket, 'Game is not in completed.', { roomId });
+      emitWarning(socket, 'Game is not completed.', { roomId });
       return;
     }
 
@@ -343,35 +399,31 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     if (!timeStamp || typeof timeStamp !== 'number') {
-      emitError(socket, 'Invalid timestamp.');
       return;
     }
 
     if (!words || !Array.isArray(words)) {
-      emitError(socket, 'Invalid words.');
       return;
     }
 
     const game = games.get(roomId);
     if (!game) {
-      emitError(socket, 'Room not found.', { roomId });
+      broadCastError(io, roomId, 'Room not found.');
       return;
     }
 
     if (game.status !== GAME_STATUS.IN_PROGRESS) {
-      emitError(socket, 'Game is not in progress.', { roomId });
       return;
     }
 
     const player = game.players.find((entry) => entry.id === socket.id);
     if (!player) {
-      emitError(socket, 'Player is not in this game.', { roomId });
       return;
     }
 
     const expiryTime = game.roundExpiresAt ?? 0;
     if (timeStamp > expiryTime + 1000) {
-      emitError(socket, 'Could not save your last word in time.', {
+      emitWarning(socket, 'Could not save your last word in time.', {
         roomId,
         round: game.round,
       });

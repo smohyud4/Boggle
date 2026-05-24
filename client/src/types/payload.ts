@@ -5,6 +5,8 @@ export type RoomJoinedPayload = {
   roomId: string;
   playerId: string;
   isAdmin: boolean;
+  waitingOnGame: boolean;
+  totalRounds: number;
 };
 
 export type LobbyPlayer = {
