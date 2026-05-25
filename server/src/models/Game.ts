@@ -1,6 +1,6 @@
 import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
 import type { GameInitializer, GameStatus, RoundResult } from '../types.js';
-import { generateBoards } from '../utils/game.ts';
+import { generateBoards } from '../utils/game.js';
 import { Player } from './Player.js';
 
 export class Game {

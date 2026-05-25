@@ -1,4 +1,4 @@
-import { Board } from '../types.ts';
+import { Board } from '../types.js';
 
 // https://boardgames.stackexchange.com/questions/29264/boggle-what-is-the-dice-configuration-for-boggle-in-various-languages
 

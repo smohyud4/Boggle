@@ -1,6 +1,6 @@
 import type { Server, Socket } from 'socket.io';
-import { registerRoomHandlers } from './roomHandlers.ts';
-import { EVENTS } from '../constants/events.ts';
+import { registerRoomHandlers } from './roomHandlers.js';
+import { EVENTS } from '../constants/events.js';
 
 export function registerHandlers(io: Server, socket: Socket): void {
   registerRoomHandlers(io, socket);

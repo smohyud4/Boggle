@@ -4,7 +4,7 @@ import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
 import { waitingPlayers, games, socketRoomMap } from '../state/store.js';
 import { Player } from '../models/Player.js';
 import { Game } from '../models/Game.js';
-import { generateBoards, normalizeWords } from '../utils/game.ts';
+import { generateBoards, normalizeWords } from '../utils/game.js';
 import {
   ensureAdmin,
   getAdminPlayer,
