@@ -12,20 +12,6 @@
   font-size: 1.2rem;
 }
 
-.field {
-  display: grid;
-  gap: 6px;
-}
-
-.field input {
-  width: 100%;
-  border: 1px solid var(--primary-navy);
-  background: var(--neutral-cream);
-  border-radius: 8px;
-  padding: 9px 10px;
-  font: inherit;
-}
-
 .radios {
   display: flex;
   flex-direction: column;
@@ -44,14 +30,4 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-#create-form button {
-  border: 1px solid var(--primary-navy);
-  background: var(--primary-navy);
-  color: white;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font: inherit;
-  cursor: pointer;
 }

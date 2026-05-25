@@ -80,15 +80,6 @@ function App() {
       setIsWaitingOnGame(false);
     };
 
-    const onGameOver = () => {
-      setIsSubmitting({
-        join: false,
-        create: false,
-        startGame: false,
-      });
-      setIsAdvancingRound(false);
-    };
-
     const onPlayerLeft = ({ name, reason }: PlayerLeftPayload) => {
       toast.info(`${name} has ${reason === 'left' ? 'left the room' : 'disconnected'}.`);
     };
@@ -125,7 +116,6 @@ function App() {
     socket.on(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
     socket.on(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
-    socket.on(SOCKET_EVENTS.GAME_OVER, onGameOver);
     socket.on(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
     socket.on(SOCKET_EVENTS.ERROR_EVENT, onError);
     socket.on(SOCKET_EVENTS.WARNING_EVENT, onWarning);
@@ -135,7 +125,6 @@ function App() {
       socket.off(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
       socket.off(SOCKET_EVENTS.ROUND_START, onRoundStart);
       socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
-      socket.off(SOCKET_EVENTS.GAME_OVER, onGameOver);
       socket.off(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
       socket.off(SOCKET_EVENTS.ERROR_EVENT, onError);
       socket.off(SOCKET_EVENTS.WARNING_EVENT, onWarning);

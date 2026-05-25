@@ -30,6 +30,11 @@
   color: white !important;
 }
 
+.muted-text {
+  margin: 0;
+  color: var(--muted-text);
+}
+
 @media (max-width: 480px) {
   .app {
     padding: 5px;

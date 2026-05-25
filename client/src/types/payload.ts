@@ -60,11 +60,6 @@ export type GameOverPayload = {
   }>;
 };
 
-export type BeginRoundPayload = {
-  roomId: string;
-  round: number;
-};
-
 export type PlayerLeftPayload = {
   roomId: string;
   playerId: string;

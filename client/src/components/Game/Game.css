@@ -184,11 +184,6 @@
   color: var(--muted-text);
 }
 
-.muted-text {
-  margin: 0;
-  color: #5b6475;
-}
-
 .game-sidebar h3 {
   font-size: 1rem;
   font-weight: 600;
