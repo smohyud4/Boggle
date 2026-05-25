@@ -7,7 +7,6 @@ import ErrorModal from './components/ErrorModal/ErrorModal';
 import { socket } from './socket/client';
 import { SOCKET_EVENTS } from './socket/events';
 import type {
-  BeginRoundPayload,
   ErrorPayload,
   LobbyUpdatedPayload,
   RoundResultPayload,
@@ -210,14 +209,9 @@ function App() {
       return;
     }
 
-    const payload: BeginRoundPayload = {
-      roomId,
-      round: roundResult.round + 1,
-    };
-
     setError('');
     setIsAdvancingRound(true);
-    socket.emit(SOCKET_EVENTS.BEGIN_ROUND, payload);
+    socket.emit(SOCKET_EVENTS.BEGIN_ROUND, { roomId });
   };
 
   return (

@@ -13,10 +13,8 @@ export const EVENTS = {
   LOBBY_UPDATED: 'lobby_updated',
   ROUND_START: 'round_start',
   ROUND_RESULT: 'round_result',
-  GAME_OVER: 'game_over',
   GAME_CANCELLED: 'game_cancelled',
   PLAYER_LEFT: 'player_left',
   ERROR: 'error_event',
   WARNING: 'warning_event',
-  INFO: 'info_event',
 } as const;

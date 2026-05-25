@@ -57,6 +57,7 @@ export class Game {
 
   restart() {
     this.roundResults = new Map();
+    this.roundSubmissions = new Map();
     this.roundExpiresAt = null;
     this.boards = generateBoards(this.totalRounds);
     this.start();
@@ -68,7 +69,7 @@ export class Game {
     this.initializeRound(this.round);
   }
 
-  initializeRound(round: number): void {
+  initializeRound(round = this.round): void {
     this.roundSubmissions.set(round, new Map());
   }
 

@@ -30,39 +30,8 @@ function broadCastError(
   });
 }
 
-function broadcastInfo(
-  io: Server,
-  roomId: string,
-  message: string,
-  details?: Record<string, unknown>,
-): void {
-  io.to(roomId).emit(EVENTS.INFO, {
-    message,
-    ...details,
-  });
-}
-
-function broadcastWarning(
-  io: Server,
-  roomId: string,
-  message: string,
-  details?: Record<string, unknown>,
-): void {
-  io.to(roomId).emit(EVENTS.WARNING, {
-    message,
-    ...details,
-  });
-}
-
 function emitError(socket: Socket, message: string, details?: Record<string, unknown>): void {
   socket.emit(EVENTS.ERROR, {
-    message,
-    ...details,
-  });
-}
-
-function emitInfo(socket: Socket, message: string, details?: Record<string, unknown>): void {
-  socket.emit(EVENTS.INFO, {
     message,
     ...details,
   });
@@ -83,15 +52,15 @@ function broadcastLobby(io: Server, roomId: string): void {
   io.to(roomId).emit(EVENTS.LOBBY_UPDATED, lobbySnapshot(waitingRoom, game));
 }
 
-function startRound(io: Server, roomId: string, roundNumber: number): void {
+function startRound(io: Server, roomId: string): void {
   const game = games.get(roomId);
   if (!game) {
     broadCastError(io, roomId, 'Game not found.', { roomId });
     return;
   }
 
-  game.round = roundNumber;
-  game.initializeRound(roundNumber);
+  const roundNumber = game.round++;
+  game.initializeRound();
   game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS / 3) * 1000;
 
   const board = game.getBoardForRound(roundNumber);
@@ -337,12 +306,12 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     setTimeout(() => {
       game.start();
-      startRound(io, roomId, game.round);
+      startRound(io, roomId);
     }, 5000);
   });
 
-  socket.on(EVENTS.BEGIN_ROUND, (payload: { roomId: string; round: number }) => {
-    const { roomId, round } = payload;
+  socket.on(EVENTS.BEGIN_ROUND, (payload: { roomId: string }) => {
+    const { roomId } = payload;
     if (!roomId || typeof roomId !== 'string') {
       emitError(socket, 'Invalid room id.');
       return;
@@ -365,7 +334,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    startRound(io, roomId, round);
+    startRound(io, roomId);
   });
 
   socket.on(EVENTS.RESTART_GAME, (payload: { roomId: string }) => {
@@ -388,7 +357,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     game.restart();
-    startRound(io, roomId, game.round);
+    startRound(io, roomId);
   });
 
   socket.on(EVENTS.SUBMIT_WORDS, (payload: SubmitWordsPayload) => {
