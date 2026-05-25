@@ -47,6 +47,7 @@ function WaitingRoom({
       position: 'bottom-center',
       autoClose: 2000,
       pauseOnHover: false,
+      pauseOnFocusLoss: false,
       transition: Flip,
     });
   };

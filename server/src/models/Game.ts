@@ -65,7 +65,7 @@ export class Game {
 
   start(): void {
     this.status = GAME_STATUS.IN_PROGRESS;
-    this.round = 1;
+    this.round = 0;
     this.initializeRound(this.round);
   }
 

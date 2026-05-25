@@ -38,6 +38,7 @@
 .field input {
   width: 100%;
   border: 1px solid var(--primary-navy);
+  background: var(--neutral-cream);
   border-radius: 8px;
   padding: 9px 10px;
   font: inherit;

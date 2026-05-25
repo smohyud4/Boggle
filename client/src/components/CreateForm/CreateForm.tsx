@@ -35,7 +35,7 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
           value={name}
           onChange={(event) => {
             const newValue = event.target.value;
-            if (nameRegex.test(newValue)) {
+            if (newValue.length === 0 || nameRegex.test(newValue)) {
               setName(newValue);
             }
           }}

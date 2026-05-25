@@ -59,7 +59,7 @@ function startRound(io: Server, roomId: string): void {
     return;
   }
 
-  const roundNumber = game.round++;
+  const roundNumber = ++game.round;
   game.initializeRound();
   game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS / 3) * 1000;
 
@@ -76,7 +76,10 @@ function startRound(io: Server, roomId: string): void {
   setTimeout(
     () => {
       const currentGame = games.get(roomId);
-      if (!currentGame || currentGame.round !== roundNumber) return;
+      if (!currentGame || currentGame.round !== roundNumber) {
+        broadCastError(io, roomId, 'Game not found.');
+        return;
+      }
       settleRound(io, roomId, 'timer_expired');
     },
     (GAME_CONFIG.ROUND_SECONDS / 3) * 1000,
