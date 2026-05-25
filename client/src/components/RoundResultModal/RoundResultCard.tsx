@@ -13,7 +13,6 @@ function RoundResultCard({ player }: RoundResultCardProps) {
           <h3>{player.name}</h3>
           <p className="result-card__meta">{player.points} points</p>
         </div>
-        <p className="result-card__score">{player.totalScore}</p>
       </div>
 
       <div className="result-card__section">
