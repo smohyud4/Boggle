@@ -61,7 +61,7 @@ function startRound(io: Server, roomId: string): void {
 
   const roundNumber = ++game.round;
   game.initializeRound();
-  game.roundExpiresAt = Date.now() + (GAME_CONFIG.ROUND_SECONDS / 3) * 1000;
+  game.roundExpiresAt = Date.now() + GAME_CONFIG.ROUND_SECONDS * 1000;
 
   const board = game.getBoardForRound(roundNumber);
   io.to(roomId).emit(EVENTS.ROUND_START, {
@@ -73,17 +73,14 @@ function startRound(io: Server, roomId: string): void {
     expiresAt: game.roundExpiresAt,
   });
 
-  setTimeout(
-    () => {
-      const currentGame = games.get(roomId);
-      if (!currentGame || currentGame.round !== roundNumber) {
-        broadCastError(io, roomId, 'Game not found.');
-        return;
-      }
-      settleRound(io, roomId, 'timer_expired');
-    },
-    (GAME_CONFIG.ROUND_SECONDS / 3) * 1000,
-  );
+  setTimeout(() => {
+    const currentGame = games.get(roomId);
+    if (!currentGame || currentGame.round !== roundNumber) {
+      broadCastError(io, roomId, 'Game not found.');
+      return;
+    }
+    settleRound(io, roomId, 'timer_expired');
+  }, GAME_CONFIG.ROUND_SECONDS * 1000);
 }
 
 function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_submitted'): void {
