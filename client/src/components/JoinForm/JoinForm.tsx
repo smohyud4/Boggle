@@ -41,7 +41,7 @@ function JoinForm({ isSubmitting, onSubmit }: JoinFormProps) {
         <span>Room code</span>
         <input
           value={roomCode}
-          onChange={(event) => setRoomCode(event.target.value)}
+          onChange={(event) => setRoomCode(event.target.value.toUpperCase())}
           placeholder="e.g. ABC123"
           maxLength={12}
           required
