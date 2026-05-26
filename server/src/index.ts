@@ -26,5 +26,5 @@ io.on(EVENTS.CONNECTION, (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`boggle server running at http://localhost:${PORT}`);
+  console.log(`boggle server running on port ${PORT}`);
 });
