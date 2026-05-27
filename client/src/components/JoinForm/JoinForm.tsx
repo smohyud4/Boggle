@@ -4,14 +4,15 @@ import './JoinForm.css';
 
 type JoinFormProps = {
   isSubmitting: boolean;
+  controlledRoomCode: string;
   onSubmit: (payload: { name: string; roomCode: string }) => void;
 };
 
 const nameRegex = /^[a-zA-Z0-9_]+$/;
 
-function JoinForm({ isSubmitting, onSubmit }: JoinFormProps) {
+function JoinForm({ isSubmitting, controlledRoomCode, onSubmit }: JoinFormProps) {
   const [name, setName] = useState('');
-  const [roomCode, setRoomCode] = useState('');
+  const [roomCode, setRoomCode] = useState(controlledRoomCode);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

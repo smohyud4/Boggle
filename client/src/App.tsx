@@ -23,6 +23,8 @@ function generateRoomCode(): string {
   return Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
+const searchParams = new URLSearchParams(window.location.search);
+
 function App() {
   const [isWaitingRoom, setIsWaitingRoom] = useState(false);
   const [roomId, setRoomId] = useState('');
@@ -41,6 +43,8 @@ function App() {
     create: false,
     startGame: false,
   });
+
+  const roomCode = searchParams.get('room') ?? '';
 
   useEffect(() => {
     const onRoomJoined = (payload: RoomJoinedPayload) => {
@@ -232,6 +236,7 @@ function App() {
           <LobbyPage
             isJoinSubmitting={isSubmitting.join}
             isCreateSubmitting={isSubmitting.create}
+            controlledRoomCode={roomCode}
             onJoin={handleJoin}
             onCreate={handleCreate}
           />

@@ -25,7 +25,7 @@ function ToastComponent() {
         gap: '5px',
       }}
     >
-      <span>Code Copied</span>
+      <span>Room Link Copied</span>
       <Check />
     </div>
   );
@@ -85,7 +85,7 @@ function WaitingRoom({
           <button
             onClick={async () => {
               try {
-                await navigator.clipboard.writeText(roomId);
+                await navigator.clipboard.writeText(`${window.location.origin}?room=${roomId}`);
                 notify();
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
               } catch (err) {

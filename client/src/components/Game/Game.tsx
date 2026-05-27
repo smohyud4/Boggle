@@ -88,6 +88,8 @@ function canSpell(board: string[], word: string) {
 
 type GameProps = RoundStartPayload;
 
+const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
+
 function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: GameProps) {
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
@@ -343,11 +345,11 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
     }
   };
 
-  if (!isPortrait) {
+  if (!isPortrait && shouldBeInPortrait) {
     return (
       <div className="orientation-overlay">
         <p>
-          Please rotate your device to portrait mode<span>📱</span>
+          Please rotate your device to portrait mode<span> 📱</span>
         </p>
       </div>
     );
