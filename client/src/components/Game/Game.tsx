@@ -32,6 +32,12 @@ function getArrowString(direction: keyof typeof arrows): JSX.Element {
   return arrows[direction];
 }
 
+function formatTime(time: number): string {
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${String(minutes).padStart(1, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
 function canSpell(board: string[], word: string) {
   const grid: string[][] = [];
   const n = Math.sqrt(board.length);
@@ -93,6 +99,9 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
   const [secondsLeft, setSecondsLeft] = useState(() => Math.ceil((expiresAt - Date.now()) / 1000));
   const [roundOver, setRoundOver] = useState(false);
   const [scoreAnimations, setScoreAnimations] = useState<{ id: number; points: number }[]>([]);
+  const [isPortrait, setIsPortrait] = useState(
+    window.matchMedia('(orientation: portrait)').matches,
+  );
 
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
@@ -113,7 +122,19 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
       }
     };
 
+    const handleOrientationChange = (e: MediaQueryListEvent) => {
+      setIsPortrait(e.matches);
+    };
+
+    const mediaQuery = window.matchMedia('(orientation: portrait)');
+
+    mediaQuery.addEventListener('change', handleOrientationChange);
+
     fetchValidWords();
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleOrientationChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -322,6 +343,16 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
     }
   };
 
+  if (!isPortrait) {
+    return (
+      <div className="orientation-overlay">
+        <p>
+          Please rotate your device to portrait mode<span>📱</span>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <section className="game-shell">
       <div className="game-board-panel">
@@ -347,7 +378,7 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
               ))}
             </div>
           </div>
-          <div className="game-timer">{secondsLeft}s</div>
+          <div className="game-timer">{formatTime(secondsLeft)}</div>
         </div>
 
         <div className="game-grid-container">

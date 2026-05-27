@@ -300,4 +300,9 @@
   .game-sidebar__panel {
     position: static;
   }
+
+  .letter-grid .letter {
+    height: 85%;
+    width: 85%;
+  }
 }
