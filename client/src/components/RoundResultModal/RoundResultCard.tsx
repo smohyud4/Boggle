@@ -1,5 +1,5 @@
 import type { RoundResultPlayerPayload } from '../../types/payload';
-import './RoundResultModal.css';
+import './index.css';
 
 type RoundResultCardProps = {
   player: RoundResultPlayerPayload;

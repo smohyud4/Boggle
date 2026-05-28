@@ -1,0 +1,356 @@
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import Arrow, { type ArrowDirection, type ArrowProps } from '../../Arrow/Arrow';
+import { generateBoard, canSpell, formatTime } from '../../../utils/game';
+import { useWordList } from '../../../context/WordListContext';
+import LocalRoundResultModal from '../../RoundResultModal/Local/RoundResultModal';
+import '../index.css';
+
+const ROUND_LENGTH = 180;
+const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
+
+function LocalBoggle() {
+  const [board, setBoard] = useState(generateBoard());
+  const [word, setWord] = useState('');
+  const [foundWords, setFoundWords] = useState<string[]>([]);
+  const [totalScore, setTotalScore] = useState(0);
+  const [currScore, setCurrScore] = useState(0);
+  const [highlighted, setHighlighted] = useState<number[]>([]);
+  const [arrows, setArrows] = useState<ArrowProps[]>([]);
+  const [prevIndex, setPrevIndex] = useState(-1);
+  const [secondsLeft, setSecondsLeft] = useState(ROUND_LENGTH);
+  const [roundOver, setRoundOver] = useState(false);
+  const [scoreAnimations, setScoreAnimations] = useState<{ id: number; points: number }[]>([]);
+  const [isPortrait, setIsPortrait] = useState(
+    window.matchMedia('(orientation: portrait)').matches,
+  );
+
+  const validWords = useWordList();
+
+  const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
+  const selectionActiveRef = useRef(false);
+  const roundSubmittedRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const ROWS = Math.sqrt(board.length);
+  const COLS = ROWS;
+
+  useEffect(() => {
+    const handleOrientationChange = (e: MediaQueryListEvent) => {
+      setIsPortrait(e.matches);
+    };
+
+    const mediaQuery = window.matchMedia('(orientation: portrait)');
+
+    mediaQuery.addEventListener('change', handleOrientationChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleOrientationChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setSecondsLeft((prevTime) => {
+        if (prevTime === 0) {
+          setRoundOver(true);
+          roundSubmittedRef.current = true;
+          clearInterval(intervalId);
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [roundOver]);
+
+  const triggerScoreAnimation = (points: number) => {
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    setScoreAnimations((prev) => [...prev, { id, points }]);
+    window.setTimeout(() => {
+      setScoreAnimations((prev) => prev.filter((a) => a.id !== id));
+    }, 1000);
+  };
+
+  const getWordScore = (candidate: string) => {
+    const scoringParams: Record<number, number> = {
+      3: 1,
+      4: 1,
+      5: 2,
+      6: 3,
+      7: 5,
+    };
+
+    if (Object.keys(scoringParams).length === 0) return 1;
+    if (candidate.length >= 8) return 11;
+    return scoringParams[candidate.length] || 0;
+  };
+
+  const validMove = (index: number) => {
+    if (!selectionActiveRef.current || highlighted.includes(index)) return false;
+
+    const row = Math.floor(index / ROWS);
+    const prevRow = Math.floor(prevIndex / ROWS);
+    const col = index % COLS;
+    const prevCol = prevIndex % COLS;
+
+    if (row === prevRow && Math.abs(index - prevIndex) === 1) return true;
+    if (col === prevCol && Math.abs(index - prevIndex) === COLS) return true;
+
+    return Math.abs(row - prevRow) === 1 && Math.abs(col - prevCol) === 1;
+  };
+
+  const drawArrow = (to: number, from: number) => {
+    const fromElement = letterRefs.current[from];
+    const toElement = letterRefs.current[to];
+
+    if (!fromElement || !toElement) return;
+
+    const fromRect = fromElement.getBoundingClientRect();
+    const toRect = toElement.getBoundingClientRect();
+
+    const scrollX = window.scrollX || window.pageXOffset;
+    const scrollY = window.scrollY || window.pageYOffset;
+
+    const midX = (fromRect.left + toRect.right) / 2 + scrollX;
+    const midY = (fromRect.top + toRect.bottom) / 2 + scrollY;
+
+    const left = `${midX}px`;
+    const top = `${midY}px`;
+    let direction: ArrowDirection;
+
+    if (to === from + 1) {
+      direction = 'right';
+    } else if (to === from - 1) {
+      direction = 'left';
+    } else if (to === from + COLS) {
+      direction = 'down';
+    } else if (to === from - COLS) {
+      direction = 'up';
+    } else if (to === from + COLS + 1) {
+      direction = 'bottom-right';
+    } else if (to === from + COLS - 1) {
+      direction = 'bottom-left';
+    } else if (to === from - COLS + 1) {
+      direction = 'top-right';
+    } else if (to === from - COLS - 1) {
+      direction = 'top-left';
+    }
+
+    setArrows((prev) => [...prev, { direction, top, left }]);
+  };
+
+  const startSelection = (letter: string, index: number) => {
+    selectionActiveRef.current = true;
+    setWord(letter);
+    setHighlighted([index]);
+    setPrevIndex(index);
+  };
+
+  const continueSelection = (letter: string, index: number) => {
+    if (!validMove(index)) return;
+
+    setWord((prev) => prev + letter);
+    drawArrow(index, prevIndex);
+    setHighlighted((prev) => [...prev, index]);
+    setPrevIndex(index);
+  };
+
+  const isValidWord = (word: string) => {
+    return !foundWords.includes(word) && validWords.has(word) && canSpell(board, word);
+  };
+
+  const handleCheckWord = () => {
+    if (!isValidWord(word)) {
+      inputRef.current?.classList.add('invalid');
+      setTimeout(() => {
+        inputRef.current?.classList.remove('invalid');
+      }, 1000);
+      return;
+    }
+
+    const score = getWordScore(word);
+
+    setFoundWords((prev) => [word, ...prev]);
+    setCurrScore((prev) => prev + score);
+    setTotalScore((prev) => prev + score);
+    triggerScoreAnimation(score);
+    setWord('');
+    setHighlighted([]);
+    setPrevIndex(-1);
+    setArrows([]);
+  };
+
+  const endSelection = () => {
+    if (!selectionActiveRef.current) return;
+
+    selectionActiveRef.current = false;
+
+    if (validWords.has(word) && !foundWords.includes(word)) {
+      const score = getWordScore(word);
+
+      setFoundWords((prev) => [word, ...prev]);
+      setCurrScore((prev) => prev + score);
+      setTotalScore((prev) => prev + score);
+      triggerScoreAnimation(score);
+    }
+
+    setWord('');
+    setHighlighted([]);
+    setPrevIndex(-1);
+    setArrows([]);
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!selectionActiveRef.current) return;
+
+    const touch = event.touches[0];
+
+    if (!touch) return;
+
+    const x = touch.clientX;
+    const y = touch.clientY;
+
+    for (let index = 0; index < ROWS * COLS; index++) {
+      const el = letterRefs.current[index];
+
+      if (!el) continue;
+
+      const rect = el.getBoundingClientRect();
+
+      const containsPoint = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
+      if (containsPoint) {
+        continueSelection(board[index], index);
+        break;
+      }
+    }
+  };
+
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value.toLowerCase();
+    if (newValue.length === 0 || /^[a-zA-Z]+$/.test(newValue)) {
+      setWord(newValue);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCheckWord();
+    }
+  };
+
+  const handleNextRound = () => {
+    setWord('');
+    setFoundWords([]);
+    setCurrScore(0);
+    setHighlighted([]);
+    setPrevIndex(-1);
+    setRoundOver(false);
+    setArrows([]);
+    setSecondsLeft(ROUND_LENGTH);
+    setBoard(generateBoard());
+    roundSubmittedRef.current = false;
+    selectionActiveRef.current = false;
+  };
+
+  if (!isPortrait && shouldBeInPortrait) {
+    return (
+      <div className="orientation-overlay">
+        <p>
+          Please rotate your device to portrait mode<span> 📱</span>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <section className="game-shell">
+      <div className="game-board-panel">
+        <div className="game-status-row">
+          <div>
+            <p className="game-eyebrow">Total Score: {totalScore}</p>
+            <div className="word-entry-row">
+              <input
+                ref={inputRef}
+                className="word-input"
+                value={word}
+                onChange={handleOnChange}
+                onKeyDown={handleKeyDown}
+                maxLength={25}
+                placeholder={scoreAnimations.length > 0 ? 'Nice!' : 'Build a word'}
+              />
+              {scoreAnimations.map((anim) => (
+                <div key={anim.id} className="points-fly">
+                  +{anim.points}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="game-timer">{formatTime(secondsLeft)}</div>
+        </div>
+
+        <div className="game-grid-container">
+          <div className="letter-grid" onPointerLeave={endSelection} onTouchMove={handleTouchMove}>
+            {board.map((letter, index) => (
+              <div key={index}>
+                <span
+                  ref={(el) => {
+                    letterRefs.current[index] = el;
+                  }}
+                  className={`letter ${highlighted.includes(index) ? 'active' : ''}`}
+                  onPointerDown={() => startSelection(letter, index)}
+                  onPointerEnter={() => continueSelection(letter, index)}
+                  onPointerUp={endSelection}
+                >
+                  {letter}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="game-sidebar">
+            <div className="word-container">
+              <h3>Words</h3>
+              {foundWords.length > 0 ? (
+                <ul>
+                  {foundWords.map((foundWord) => (
+                    <li key={foundWord}>{foundWord}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="muted-text">No words found yet.</p>
+              )}
+            </div>
+            <div className="score-container">
+              <h3>Score</h3>
+              <p className="score-value">{currScore}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {createPortal(
+        arrows.map((arrow, index) => (
+          <Arrow key={index} direction={arrow.direction} top={arrow.top} left={arrow.left} />
+        )),
+        document.body,
+      )}
+      {roundOver && (
+        <LocalRoundResultModal
+          player={{
+            playerId: '',
+            name: 'Results',
+            submittedWords: foundWords,
+            acceptedWords: foundWords,
+            points: currScore,
+            totalWords: foundWords.length,
+            totalScore: 0,
+          }}
+          onNextRound={handleNextRound}
+        />
+      )}
+    </section>
+  );
+}
+
+export default LocalBoggle;

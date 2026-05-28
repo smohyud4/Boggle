@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import type { RoundResultPayload } from '../../types/payload';
-import RoundResultCard from './RoundResultCard';
-import './RoundResultModal.css';
-import { socket } from '../../socket/client';
-import { SOCKET_EVENTS } from '../../socket/events';
-import LeaderBoard from '../Leaderboard/Leaderboard';
+import type { RoundResultPayload } from '../../../types/payload';
+import RoundResultCard from '../RoundResultCard';
+import { socket } from '../../../socket/client';
+import { SOCKET_EVENTS } from '../../../socket/events';
+import LeaderBoard from '../../Leaderboard/Leaderboard';
+import '../index.css';
 
 type RoundResultModalProps = {
   roundResult: RoundResultPayload;
@@ -15,7 +15,7 @@ type RoundResultModalProps = {
   onNextRound: () => void;
 };
 
-function RoundResultModal({
+function OnlineRoundResultModal({
   roundResult,
   roomId,
   totalRounds,
@@ -94,4 +94,4 @@ function RoundResultModal({
   );
 }
 
-export default RoundResultModal;
+export default OnlineRoundResultModal;

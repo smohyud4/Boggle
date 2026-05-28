@@ -1,21 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Arrow, { type ArrowDirection, type ArrowProps } from '../Arrow/Arrow';
-import { socket } from '../../socket/client';
-import { SOCKET_EVENTS } from '../../socket/events';
-import type { RoundStartPayload } from '../../types/payload';
-import { canSpell, formatTime } from '../../utils/game';
-import './Game.css';
+import Arrow, { type ArrowDirection, type ArrowProps } from '../../Arrow/Arrow';
+import { socket } from '../../../socket/client';
+import { SOCKET_EVENTS } from '../../../socket/events';
+import type { RoundStartPayload } from '../../../types/payload';
+import { canSpell, formatTime } from '../../../utils/game';
+import { useWordList } from '../../../context/WordListContext';
+import '../index.css';
 
 type GameProps = RoundStartPayload;
 
 const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
 
-function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: GameProps) {
+function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expiresAt }: GameProps) {
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [currScore, setCurrScore] = useState(0);
-  const [validWords, setValidWords] = useState<Set<string>>(new Set());
   const [highlighted, setHighlighted] = useState<number[]>([]);
   const [arrows, setArrows] = useState<ArrowProps[]>([]);
   const [prevIndex, setPrevIndex] = useState(-1);
@@ -26,6 +26,8 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
     window.matchMedia('(orientation: portrait)').matches,
   );
 
+  const validWords = useWordList();
+
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
   const roundSubmittedRef = useRef(false);
@@ -35,16 +37,6 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
   const COLS = ROWS;
 
   useEffect(() => {
-    const fetchValidWords = async () => {
-      try {
-        const response = await fetch('word-list.txt');
-        const data = await response.text();
-        setValidWords(new Set(data.split('\n').map((entry) => entry.trim())));
-      } catch (error) {
-        console.error('Error fetching valid words:', error);
-      }
-    };
-
     const handleOrientationChange = (e: MediaQueryListEvent) => {
       setIsPortrait(e.matches);
     };
@@ -52,8 +44,6 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
     const mediaQuery = window.matchMedia('(orientation: portrait)');
 
     mediaQuery.addEventListener('change', handleOrientationChange);
-
-    fetchValidWords();
 
     return () => {
       mediaQuery.removeEventListener('change', handleOrientationChange);
@@ -359,4 +349,4 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
   );
 }
 
-export default Game;
+export default OnlineBoggle;

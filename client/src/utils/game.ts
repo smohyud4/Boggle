@@ -1,3 +1,43 @@
+const BOGGLE_DICE: Record<number, string[]> = {
+  1: ['r', 'i', 'f', 'o', 'b', 'x'],
+  2: ['i', 'f', 'e', 'h', 'e', 'y'],
+  3: ['d', 'e', 'n', 'o', 'w', 's'],
+  4: ['u', 't', 'o', 'k', 'n', 'd'],
+  5: ['h', 'm', 's', 'r', 'a', 'o'],
+  6: ['l', 'u', 'p', 'e', 't', 's'],
+  7: ['a', 'c', 'i', 't', 'o', 'a'],
+  8: ['y', 'l', 'g', 'k', 'u', 'e'],
+  9: ['qu', 'b', 'm', 'j', 'o', 'a'],
+  10: ['e', 'h', 'i', 's', 'p', 'n'],
+  11: ['v', 'e', 't', 'i', 'g', 'n'],
+  12: ['b', 'a', 'l', 'i', 'y', 't'],
+  13: ['e', 'z', 'a', 'v', 'n', 'd'],
+  14: ['r', 'a', 'l', 'e', 's', 'c'],
+  15: ['u', 'w', 'i', 'l', 'r', 'g'],
+  16: ['p', 'a', 'c', 'e', 'm', 'd'],
+};
+
+export function generateBoard(): string[] {
+  const board: string[] = [];
+  const numbers = Array.from({ length: 16 }, (_, i) => i + 1);
+
+  for (let i = numbers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+  }
+
+  for (const num of numbers) {
+    const dice = BOGGLE_DICE[num];
+    board.push(dice[Math.floor(Math.random() * dice.length)]);
+  }
+
+  return board;
+}
+
+export function generateRoomCode(): string {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
 export function formatTime(time: number): string {
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
