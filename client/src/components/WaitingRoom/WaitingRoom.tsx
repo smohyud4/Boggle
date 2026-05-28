@@ -64,6 +64,29 @@ function WaitingRoom({
     };
   }, []);
 
+  const handleShare = () => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const url = `${window.location.origin}${window.location.pathname}?room=${roomId}`;
+
+    if (isMobile && navigator.share) {
+      const shareData: ShareData = {
+        title: `BoggleVerse`,
+        text: 'Join my Boggle Lobby',
+        url,
+      };
+
+      navigator
+        .share(shareData)
+        .then(() => console.log('Shared successfully'))
+        .catch(() => alert('Failed to copy results.'));
+    } else {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => notify())
+        .catch(() => toast.error('Failed to copy room code'));
+    }
+  };
+
   if (countdown) {
     return (
       <section className="starting-shell">
@@ -82,19 +105,7 @@ function WaitingRoom({
       <div className="code-container">
         <div className="room-code">
           Room Code: <span>{roomId}</span>
-          <button
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(
-                  `${window.location.origin}${window.location.pathname}?room=${roomId}`,
-                );
-                notify();
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              } catch (err) {
-                toast.error('Failed to copy room code');
-              }
-            }}
-          >
+          <button onClick={handleShare}>
             <Copy className="copy-icon" />
           </button>
         </div>

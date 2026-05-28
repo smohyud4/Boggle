@@ -19,6 +19,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import type { ScoringType } from '../../../types/payload';
 import '../index.css';
 import { generateRoomCode } from '../../../utils/game';
+import Header from '../../Header/Header';
 
 const searchParams = new URLSearchParams(window.location.search);
 
@@ -56,6 +57,10 @@ function OnlineGame() {
         create: false,
         startGame: false,
       });
+
+      searchParams.delete('room');
+      const newUrl = `${window.location.origin}${window.location.pathname}`;
+      window.history.replaceState({}, '', newUrl);
     };
 
     const onLobbyUpdated = (payload: LobbyUpdatedPayload) => {
@@ -206,6 +211,7 @@ function OnlineGame() {
 
   return (
     <>
+      <Header />
       <main className="app">
         {gameInfo !== null ? (
           <>

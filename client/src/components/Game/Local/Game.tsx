@@ -1,11 +1,15 @@
 import LocalBoggle from '../../Boggle/Local/Boggle';
+import Header from '../../Header/Header';
 import '../index.css';
 
 function LocalGame() {
   return (
-    <main className="app">
-      <LocalBoggle />
-    </main>
+    <>
+      <Header />
+      <main className="app">
+        <LocalBoggle />
+      </main>
+    </>
   );
 }
 
