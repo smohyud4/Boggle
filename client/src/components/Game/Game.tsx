@@ -1,90 +1,11 @@
-import { useEffect, useRef, useState, type JSX } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Arrow, { type ArrowProps } from '../Arrow/Arrow';
+import Arrow, { type ArrowDirection, type ArrowProps } from '../Arrow/Arrow';
 import { socket } from '../../socket/client';
 import { SOCKET_EVENTS } from '../../socket/events';
 import type { RoundStartPayload } from '../../types/payload';
+import { canSpell, formatTime } from '../../utils/game';
 import './Game.css';
-
-import {
-  ArrowLeft,
-  ArrowUp,
-  ArrowRight,
-  ArrowDown,
-  ArrowUpRight,
-  ArrowUpLeft,
-  ArrowDownRight,
-  ArrowDownLeft,
-} from 'lucide-react';
-
-const arrows = {
-  left: <ArrowLeft className="arrow-icon" />,
-  up: <ArrowUp className="arrow-icon" />,
-  right: <ArrowRight className="arrow-icon" />,
-  down: <ArrowDown className="arrow-icon" />,
-  'top-right': <ArrowUpRight className="arrow-icon" />,
-  'top-left': <ArrowUpLeft className="arrow-icon" />,
-  'bottom-right': <ArrowDownRight className="arrow-icon" />,
-  'bottom-left': <ArrowDownLeft className="arrow-icon" />,
-};
-
-function getArrowString(direction: keyof typeof arrows): JSX.Element {
-  return arrows[direction];
-}
-
-function formatTime(time: number): string {
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-  return `${String(minutes).padStart(1, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
-function canSpell(board: string[], word: string) {
-  const grid: string[][] = [];
-  const n = Math.sqrt(board.length);
-
-  for (let i = 0; i < n; i++) {
-    grid.push(board.slice(i * n, (i + 1) * n));
-  }
-
-  function dfs(r: number, c: number, index: number, visited = new Set<number>()): boolean {
-    if (r < 0 || r >= n || c < 0 || c >= n) return false;
-
-    const square = r * n + c;
-    const cellContent = grid[r][c];
-    const cellLength = cellContent.length;
-
-    if (visited.has(square)) return false;
-    if (index >= word.length) return false;
-
-    if (cellContent !== word.slice(index, index + cellLength)) return false;
-
-    if (index + cellLength === word.length) return true;
-
-    visited.add(square);
-
-    const nextIndex = index + cellLength;
-
-    if (dfs(r + 1, c, nextIndex, visited)) return true;
-    if (dfs(r - 1, c, nextIndex, visited)) return true;
-    if (dfs(r, c - 1, nextIndex, visited)) return true;
-    if (dfs(r, c + 1, nextIndex, visited)) return true;
-    if (dfs(r + 1, c + 1, nextIndex, visited)) return true;
-    if (dfs(r - 1, c - 1, nextIndex, visited)) return true;
-    if (dfs(r + 1, c - 1, nextIndex, visited)) return true;
-    if (dfs(r - 1, c + 1, nextIndex, visited)) return true;
-
-    visited.delete(square);
-    return false;
-  }
-
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (dfs(i, j, 0)) return true;
-    }
-  }
-
-  return false;
-}
 
 type GameProps = RoundStartPayload;
 
@@ -212,24 +133,24 @@ function Game({ roomId, round, totalRounds, board, scoringParams, expiresAt }: G
 
     const left = `${midX}px`;
     const top = `${midY}px`;
-    let direction: JSX.Element;
+    let direction: ArrowDirection;
 
     if (to === from + 1) {
-      direction = getArrowString('right');
+      direction = 'right';
     } else if (to === from - 1) {
-      direction = getArrowString('left');
+      direction = 'left';
     } else if (to === from + COLS) {
-      direction = getArrowString('down');
+      direction = 'down';
     } else if (to === from - COLS) {
-      direction = getArrowString('up');
+      direction = 'up';
     } else if (to === from + COLS + 1) {
-      direction = getArrowString('bottom-right');
+      direction = 'bottom-right';
     } else if (to === from + COLS - 1) {
-      direction = getArrowString('bottom-left');
+      direction = 'bottom-left';
     } else if (to === from - COLS + 1) {
-      direction = getArrowString('top-right');
+      direction = 'top-right';
     } else if (to === from - COLS - 1) {
-      direction = getArrowString('top-left');
+      direction = 'top-left';
     }
 
     setArrows((prev) => [...prev, { direction, top, left }]);
