@@ -85,7 +85,9 @@ function WaitingRoom({
           <button
             onClick={async () => {
               try {
-                await navigator.clipboard.writeText(`${window.location.origin}?room=${roomId}`);
+                await navigator.clipboard.writeText(
+                  `${window.location.origin}${window.location.pathname}?room=${roomId}`,
+                );
                 notify();
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
               } catch (err) {

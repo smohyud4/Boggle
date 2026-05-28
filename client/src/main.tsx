@@ -1,12 +1,15 @@
 import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
 import { Analytics } from '@vercel/analytics/react';
 import App from './App.tsx';
+import ReactDOM from 'react-dom/client';
+import { WordListProvider } from './context/WordListContext';
 import './index.css';
 
-createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Analytics />
-    <App />
+    <WordListProvider>
+      <App />
+    </WordListProvider>
   </StrictMode>,
 );
