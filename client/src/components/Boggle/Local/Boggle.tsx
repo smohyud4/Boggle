@@ -9,8 +9,12 @@ import '../index.css';
 const ROUND_LENGTH = 180;
 const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
 
-function LocalBoggle() {
-  const [board, setBoard] = useState(generateBoard());
+type LocalBoggleProps = {
+  boardDimension: number;
+};
+
+function LocalBoggle({ boardDimension }: LocalBoggleProps) {
+  const [board, setBoard] = useState(generateBoard(boardDimension));
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [totalScore, setTotalScore] = useState(0);
@@ -63,6 +67,21 @@ function LocalBoggle() {
 
     return () => clearInterval(intervalId);
   }, [roundOver]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setWord('');
+    setFoundWords([]);
+    setCurrScore(0);
+    setHighlighted([]);
+    setPrevIndex(-1);
+    setRoundOver(false);
+    setArrows([]);
+    setSecondsLeft(ROUND_LENGTH);
+    setBoard(generateBoard(boardDimension));
+    roundSubmittedRef.current = false;
+    selectionActiveRef.current = false;
+  }, [boardDimension]);
 
   const triggerScoreAnimation = (points: number) => {
     const id = Date.now() + Math.floor(Math.random() * 1000);
@@ -249,7 +268,7 @@ function LocalBoggle() {
     setRoundOver(false);
     setArrows([]);
     setSecondsLeft(ROUND_LENGTH);
-    setBoard(generateBoard());
+    setBoard(generateBoard(boardDimension));
     roundSubmittedRef.current = false;
     selectionActiveRef.current = false;
   };
@@ -291,14 +310,18 @@ function LocalBoggle() {
         </div>
 
         <div className="game-grid-container">
-          <div className="letter-grid" onPointerLeave={endSelection} onTouchMove={handleTouchMove}>
+          <div
+            className={`letter-grid letter-grid-${boardDimension}`}
+            onPointerLeave={endSelection}
+            onTouchMove={handleTouchMove}
+          >
             {board.map((letter, index) => (
-              <div key={index}>
+              <div key={index} className={`dice-container dice-container-${boardDimension}`}>
                 <span
                   ref={(el) => {
                     letterRefs.current[index] = el;
                   }}
-                  className={`letter ${highlighted.includes(index) ? 'active' : ''}`}
+                  className={`letter letter-${boardDimension} ${highlighted.includes(index) ? 'active' : ''}`}
                   onPointerDown={() => startSelection(letter, index)}
                   onPointerEnter={() => continueSelection(letter, index)}
                   onPointerUp={endSelection}

@@ -295,14 +295,18 @@ function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expire
         </div>
 
         <div className="game-grid-container">
-          <div className="letter-grid" onPointerLeave={endSelection} onTouchMove={handleTouchMove}>
+          <div
+            className={`letter-grid letter-grid-${ROWS}`}
+            onPointerLeave={endSelection}
+            onTouchMove={handleTouchMove}
+          >
             {board.map((letter, index) => (
-              <div key={index}>
+              <div key={index} className={`dice-container dice-container-${ROWS}`}>
                 <span
                   ref={(el) => {
                     letterRefs.current[index] = el;
                   }}
-                  className={`letter ${highlighted.includes(index) ? 'active' : ''}`}
+                  className={`letter letter-${ROWS} ${highlighted.includes(index) ? 'active' : ''}`}
                   onPointerDown={() => startSelection(letter, index)}
                   onPointerEnter={() => continueSelection(letter, index)}
                   onPointerUp={endSelection}

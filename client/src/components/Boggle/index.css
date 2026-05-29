@@ -78,28 +78,42 @@
   display: grid;
   background-color: var(--dark-cream);
   padding: 10px;
-  grid-template-columns: repeat(4, 1fr);
   flex: 1;
   border-radius: 6px;
+  font-size: 2rem;
   aspect-ratio: 1 / 1;
   touch-action: none;
   gap: 8px;
 }
 
-.letter-grid > div {
+.letter-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.letter-grid-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.dice-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: min(8px, 1vw);
   background-color: var(--neutral-cream);
   border-radius: 12px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.dice-container-4 {
+  padding: min(8px, 1vw);
+}
+
+.dice-container-5 {
+  padding: min(6px, 0.8vw);
+}
+
 .letter-grid .letter {
   width: 100%;
   height: 100%;
-  font-size: 2rem;
   font-weight: bold;
   text-transform: uppercase;
   color: var(--primary-navy);
@@ -114,6 +128,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.letter-grid .letter-4 {
+  font-size: 1em;
+}
+
+.letter-grid .letter-5 {
+  font-size: 0.8em;
 }
 
 .letter-grid .active {
@@ -255,7 +277,7 @@
     padding: 8px 10px;
   }
 
-  .letter-grid .letter {
+  .letter-grid {
     font-size: 1.5rem;
   }
 
@@ -304,5 +326,9 @@
   .letter-grid .letter {
     height: 85%;
     width: 85%;
+  }
+
+  .letter-grid-5 {
+    gap: 5px;
   }
 }
