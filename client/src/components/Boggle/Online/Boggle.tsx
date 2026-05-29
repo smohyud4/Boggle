@@ -4,7 +4,7 @@ import Arrow, { type ArrowDirection, type ArrowProps } from '../../Arrow/Arrow';
 import { socket } from '../../../socket/client';
 import { SOCKET_EVENTS } from '../../../socket/events';
 import type { RoundStartPayload } from '../../../types/payload';
-import { canSpell, formatTime } from '../../../utils/game';
+import { canSpell, formatTime, getWordScore } from '../../../utils/game';
 import { useWordList } from '../../../context/WordListContext';
 import '../index.css';
 
@@ -12,7 +12,7 @@ type GameProps = RoundStartPayload;
 
 const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
 
-function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expiresAt }: GameProps) {
+function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProps) {
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [currScore, setCurrScore] = useState(0);
@@ -86,12 +86,6 @@ function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expire
     }, 1000);
   };
 
-  const getWordScore = (candidate: string) => {
-    if (Object.keys(scoringParams).length === 0) return 1;
-    if (candidate.length >= 8) return 11;
-    return scoringParams[candidate.length] || 0;
-  };
-
   const validMove = (index: number) => {
     if (!selectionActiveRef.current || highlighted.includes(index)) return false;
 
@@ -143,7 +137,7 @@ function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expire
       direction = 'top-left';
     }
 
-    setArrows((prev) => [...prev, { direction, top, left }]);
+    setArrows((prev) => [...prev, { direction, top, left, boardDimension: ROWS }]);
   };
 
   const startSelection = (letter: string, index: number) => {
@@ -175,7 +169,7 @@ function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expire
       return;
     }
 
-    const score = getWordScore(word);
+    const score = getWordScore(word, ROWS);
 
     socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
       roomId,
@@ -198,7 +192,7 @@ function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expire
     selectionActiveRef.current = false;
 
     if (validWords.has(word) && !foundWords.includes(word)) {
-      const score = getWordScore(word);
+      const score = getWordScore(word, ROWS);
 
       socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
         roomId,
@@ -345,7 +339,13 @@ function OnlineBoggle({ roomId, round, totalRounds, board, scoringParams, expire
 
       {createPortal(
         arrows.map((arrow, index) => (
-          <Arrow key={index} direction={arrow.direction} top={arrow.top} left={arrow.left} />
+          <Arrow
+            key={index}
+            direction={arrow.direction}
+            top={arrow.top}
+            left={arrow.left}
+            boardDimension={ROWS}
+          />
         )),
         document.body,
       )}

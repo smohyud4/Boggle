@@ -4,7 +4,7 @@ import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
 import { waitingPlayers, games, socketRoomMap } from '../state/store.js';
 import { Player } from '../models/Player.js';
 import { Game } from '../models/Game.js';
-import { generateBoards, normalizeWords } from '../utils/game.js';
+import { normalizeWords } from '../utils/game.js';
 import {
   ensureAdmin,
   getAdminPlayer,
@@ -69,7 +69,6 @@ function startRound(io: Server, roomId: string): void {
     round: roundNumber,
     totalRounds: game.totalRounds,
     board,
-    scoringParams: game.scoringParams,
     expiresAt: game.roundExpiresAt,
   });
 
@@ -187,7 +186,7 @@ function removeSocketFromRoom(
 
 export function registerRoomHandlers(io: Server, socket: Socket): void {
   socket.on(EVENTS.JOIN_ROOM, (payload: JoinRoomPayload) => {
-    const { roomId, playerName, create, totalRounds, scoringParams } = payload;
+    const { roomId, playerName, create, totalRounds, boardDimension } = payload;
 
     if (!roomId || typeof roomId !== 'string') {
       emitError(socket, 'Invalid room id.', { type: 'form_error' });
@@ -196,6 +195,11 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     if (!playerName || typeof playerName !== 'string') {
       emitError(socket, 'Player name is required.', { type: 'form_error' });
+      return;
+    }
+
+    if (create && boardDimension !== 4 && boardDimension !== 5) {
+      emitError(socket, 'Board dimension should be 4 or 5.', { type: 'form_error' });
       return;
     }
 
@@ -224,9 +228,8 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
       game = new Game({
         roomId: normalizedRoomId,
-        boards: generateBoards(totalRounds || GAME_CONFIG.TOTAL_ROUNDS),
         totalRounds,
-        scoringParams,
+        boardDimension,
       });
 
       waitingPlayers.set(normalizedRoomId, waitingRoom);

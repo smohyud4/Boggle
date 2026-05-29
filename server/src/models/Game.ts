@@ -7,8 +7,8 @@ export class Game {
   roomId: string;
   round: number;
   totalRounds: number;
+  boardDimension: number;
   players: Player[];
-  scoringParams: Record<number, number>;
   boards: string[][];
   status: GameStatus;
   roundSubmissions: Map<number, Map<string, Set<string>>>;
@@ -16,19 +16,14 @@ export class Game {
   roundExpiresAt: number | null;
 
   constructor(payload: GameInitializer) {
-    const {
-      roomId,
-      boards,
-      totalRounds = GAME_CONFIG.TOTAL_ROUNDS,
-      scoringParams = GAME_CONFIG.SCORE_BY_LENGTH,
-    } = payload;
+    const { roomId, totalRounds = GAME_CONFIG.TOTAL_ROUNDS, boardDimension = 4 } = payload;
 
+    this.boards = generateBoards(totalRounds, boardDimension);
+    this.boardDimension = boardDimension;
     this.roomId = roomId;
     this.round = 0;
     this.totalRounds = totalRounds;
     this.players = [];
-    this.scoringParams = scoringParams;
-    this.boards = boards;
     this.status = GAME_STATUS.LOBBY;
     this.roundSubmissions = new Map();
     this.roundResults = new Map();
@@ -59,7 +54,7 @@ export class Game {
     this.roundResults = new Map();
     this.roundSubmissions = new Map();
     this.roundExpiresAt = null;
-    this.boards = generateBoards(this.totalRounds);
+    this.boards = generateBoards(this.totalRounds, this.boardDimension);
     this.start();
   }
 
@@ -101,9 +96,8 @@ export class Game {
   }
 
   getWordScore(word: string): number {
-    if (Object.keys(this.scoringParams).length === 0) return 1;
     if (word.length >= 8) return 11;
-    return this.scoringParams[word.length] || 0;
+    return GAME_CONFIG.SCORE_BY_LENGTH[this.boardDimension][word.length] || 0;
   }
 
   scoreRound() {

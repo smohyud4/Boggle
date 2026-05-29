@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Arrow, { type ArrowDirection, type ArrowProps } from '../../Arrow/Arrow';
-import { generateBoard, canSpell, formatTime } from '../../../utils/game';
+import { generateBoard, canSpell, formatTime, getWordScore } from '../../../utils/game';
 import { useWordList } from '../../../context/WordListContext';
 import LocalRoundResultModal from '../../RoundResultModal/Local/RoundResultModal';
 import '../index.css';
@@ -91,20 +91,6 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
     }, 1000);
   };
 
-  const getWordScore = (candidate: string) => {
-    const scoringParams: Record<number, number> = {
-      3: 1,
-      4: 1,
-      5: 2,
-      6: 3,
-      7: 5,
-    };
-
-    if (Object.keys(scoringParams).length === 0) return 1;
-    if (candidate.length >= 8) return 11;
-    return scoringParams[candidate.length] || 0;
-  };
-
   const validMove = (index: number) => {
     if (!selectionActiveRef.current || highlighted.includes(index)) return false;
 
@@ -156,7 +142,7 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
       direction = 'top-left';
     }
 
-    setArrows((prev) => [...prev, { direction, top, left }]);
+    setArrows((prev) => [...prev, { direction, top, left, boardDimension }]);
   };
 
   const startSelection = (letter: string, index: number) => {
@@ -188,7 +174,7 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
       return;
     }
 
-    const score = getWordScore(word);
+    const score = getWordScore(word, boardDimension);
 
     setFoundWords((prev) => [word, ...prev]);
     setCurrScore((prev) => prev + score);
@@ -206,7 +192,7 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
     selectionActiveRef.current = false;
 
     if (validWords.has(word) && !foundWords.includes(word)) {
-      const score = getWordScore(word);
+      const score = getWordScore(word, boardDimension);
 
       setFoundWords((prev) => [word, ...prev]);
       setCurrScore((prev) => prev + score);
@@ -354,7 +340,13 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
 
       {createPortal(
         arrows.map((arrow, index) => (
-          <Arrow key={index} direction={arrow.direction} top={arrow.top} left={arrow.left} />
+          <Arrow
+            key={index}
+            direction={arrow.direction}
+            top={arrow.top}
+            left={arrow.left}
+            boardDimension={boardDimension}
+          />
         )),
         document.body,
       )}

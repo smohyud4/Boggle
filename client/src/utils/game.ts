@@ -52,6 +52,23 @@ const BOGGLE_BOARDS: Record<number, BoggleDice> = {
   5: BOGGLE_5x5,
 };
 
+const BOGGLE_SCORING_PARAMS: Record<number, Record<number, number>> = {
+  4: {
+    3: 1,
+    4: 1,
+    5: 2,
+    6: 3,
+    7: 5,
+  },
+  5: {
+    3: 1,
+    4: 1,
+    5: 2,
+    6: 3,
+    7: 5,
+  },
+};
+
 export function generateBoard(n: number): string[] {
   const board: string[] = [];
   const numbers = Array.from({ length: n * n }, (_, i) => i + 1);
@@ -71,6 +88,11 @@ export function generateBoard(n: number): string[] {
 
 export function generateRoomCode(): string {
   return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+export function getWordScore(word: string, dimension: number) {
+  if (word.length >= 8) return 11;
+  return BOGGLE_SCORING_PARAMS[dimension][word.length] || 0;
 }
 
 export function formatTime(time: number): string {

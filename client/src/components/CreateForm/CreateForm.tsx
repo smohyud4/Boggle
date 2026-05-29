@@ -2,11 +2,9 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import './CreateForm.css';
 
-type ScoringType = 'default' | 'equal';
-
 type CreateFormProps = {
   isSubmitting: boolean;
-  onSubmit: (payload: { name: string; rounds: number; scoringType: ScoringType }) => void;
+  onSubmit: (payload: { name: string; rounds: number; boardDimension: number }) => void;
 };
 
 const nameRegex = /^[a-zA-Z0-9_]+$/;
@@ -14,14 +12,14 @@ const nameRegex = /^[a-zA-Z0-9_]+$/;
 function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
   const [name, setName] = useState('');
   const [rounds, setRounds] = useState('3');
-  const [scoringType, setScoringType] = useState<ScoringType>('default');
+  const [boardDimension, setBoardDimension] = useState(4);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSubmit({
       name,
       rounds: Number(rounds),
-      scoringType,
+      boardDimension,
     });
   };
 
@@ -58,25 +56,25 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
       </label>
 
       <fieldset className="radios">
-        <legend>Scoring</legend>
+        <legend>Board Dimension</legend>
         <div className="label-container">
           <label>
             <input
               type="radio"
-              name="scoringType"
-              checked={scoringType === 'default'}
-              onChange={() => setScoringType('default')}
+              name="boardDimension"
+              checked={boardDimension === 4}
+              onChange={() => setBoardDimension(4)}
             />
-            Default
+            4x4
           </label>
           <label>
             <input
               type="radio"
-              name="scoringType"
-              checked={scoringType === 'equal'}
-              onChange={() => setScoringType('equal')}
+              name="boardDimension"
+              checked={boardDimension === 5}
+              onChange={() => setBoardDimension(5)}
             />
-            Equal
+            5x5
           </label>
         </div>
       </fieldset>
