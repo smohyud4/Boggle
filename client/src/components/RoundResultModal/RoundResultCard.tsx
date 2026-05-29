@@ -17,7 +17,7 @@ function RoundResultCard({ player }: RoundResultCardProps) {
 
       <div className="result-card__section">
         <div className="result-card__section-header">
-          <h4>Accepted words</h4>
+          <h4>Unique words</h4>
           <span className="result-card__word-count">{player.acceptedWords.length}</span>
         </div>
 
