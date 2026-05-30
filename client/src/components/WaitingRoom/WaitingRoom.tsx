@@ -31,6 +31,8 @@ function ToastComponent() {
   );
 }
 
+let boardDimension: number;
+
 function WaitingRoom({
   roomId,
   players,
@@ -41,6 +43,7 @@ function WaitingRoom({
   onStartGame,
 }: WaitingRoomProps) {
   const [countdown, setCountdown] = useState(false);
+
   const notify = () => {
     toast(<ToastComponent />, {
       className: 'copy-toast',
@@ -53,8 +56,9 @@ function WaitingRoom({
   };
 
   useEffect(() => {
-    const onGameStarting = () => {
+    const onGameStarting = (dim: number) => {
       setCountdown(true);
+      boardDimension = dim;
     };
 
     socket.on(SOCKET_EVENTS.GAME_STARTING, onGameStarting);
@@ -90,8 +94,8 @@ function WaitingRoom({
   if (countdown) {
     return (
       <section className="starting-shell">
-        <div className="loader-container">
-          {Array.from({ length: 16 }).map((_, index) => (
+        <div className={`loader-container loader-container-${boardDimension}`}>
+          {Array.from({ length: boardDimension * boardDimension }).map((_, index) => (
             <span key={index} className="loader" />
           ))}
         </div>

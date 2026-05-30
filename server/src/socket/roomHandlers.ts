@@ -305,7 +305,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     game.setPlayers(Array.from(waitingRoom.values()));
 
-    io.to(roomId).emit(EVENTS.GAME_STARTING);
+    io.to(roomId).emit(EVENTS.GAME_STARTING, game.boardDimension);
 
     setTimeout(() => {
       game.start();
