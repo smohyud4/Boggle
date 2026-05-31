@@ -18,7 +18,7 @@ export default function ErrorModal({ message, onRefresh }: Props) {
         </div>
         <div className="error-modal-actions">
           <button className="error-modal-button" onClick={onRefresh}>
-            Refresh page
+            Exit Game
           </button>
         </div>
       </div>

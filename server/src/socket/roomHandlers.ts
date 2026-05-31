@@ -261,7 +261,11 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     const game = games.get(roomId);
-    if (!game || game.status === GAME_STATUS.CANCELLED) {
+    if (
+      !game ||
+      game.status === GAME_STATUS.CANCELLED ||
+      game.getPlayerById(playerId) === undefined
+    ) {
       return;
     }
 

@@ -20,6 +20,11 @@ import type { ScoringType } from '../../../types/payload';
 import '../index.css';
 import { generateRoomCode } from '../../../utils/game';
 import Header from '../../Header/Header';
+import {
+  saveSessionToStorage,
+  getSessionFromStorage,
+  clearSessionFromStorage,
+} from '../../../utils/session';
 
 const searchParams = new URLSearchParams(window.location.search);
 
@@ -59,8 +64,7 @@ function OnlineGame() {
         startGame: false,
       });
 
-      localStorage.setItem('player_id', payload.playerId);
-      localStorage.setItem('room_id', payload.roomId);
+      saveSessionToStorage(payload.playerId, payload.roomId);
 
       searchParams.delete('room');
       const newUrl = `${window.location.origin}${window.location.pathname}`;
@@ -81,6 +85,7 @@ function OnlineGame() {
     const onRoundStart = (payload: RoundStartPayload) => {
       setRoundResult(null);
       setIsAdvancingRound(false);
+      setRoomId(payload.roomId);
       setGameInfo(payload);
     };
 
@@ -126,21 +131,39 @@ function OnlineGame() {
       });
     };
 
-    socket.on('disconnect', () => {
-      setFormError('Trying to reconnect...');
-    });
+    const onConnect = () => {
+      setFormError('');
 
-    socket.on('connect', () => {
-      const formerPlayerId = localStorage.getItem('player_id');
-      const formerRoomId = localStorage.getItem('room_id');
-
-      if (formerPlayerId && formerRoomId) {
+      const session = getSessionFromStorage();
+      if (session) {
         socket.emit(SOCKET_EVENTS.REJOIN_ROOM, {
-          playerId: formerPlayerId,
-          roomId: formerRoomId,
+          playerId: session.playerId,
+          roomId: session.roomId,
         });
       }
+    };
+
+    socket.on('disconnect', () => {
+      if (socket.active) {
+        setFormError('Trying to reconnect...');
+      } else {
+        clearSessionFromStorage();
+
+        setError('Could not reconnect.');
+        setShowServerErrorModal(true);
+        setIsSubmitting({
+          join: false,
+          create: false,
+          startGame: false,
+        });
+        setIsAdvancingRound(false);
+      }
     });
+    socket.on('connect', onConnect);
+
+    if (socket.connected) {
+      onConnect();
+    }
 
     socket.on(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
     socket.on(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
@@ -151,6 +174,9 @@ function OnlineGame() {
     socket.on(SOCKET_EVENTS.WARNING_EVENT, onWarning);
 
     return () => {
+      socket.off('disconnect');
+      socket.off('connect', onConnect);
+
       socket.off(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
       socket.off(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
       socket.off(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -240,8 +266,8 @@ function OnlineGame() {
         {gameInfo !== null ? (
           <>
             <OnlineBoggle
-              key={`${roomId}-${gameInfo.round}`}
-              roomId={roomId}
+              key={`${gameInfo.roomId}-${gameInfo.round}`}
+              roomId={gameInfo.roomId}
               round={gameInfo.round}
               totalRounds={gameInfo.totalRounds}
               board={gameInfo.board}
@@ -277,7 +303,13 @@ function OnlineGame() {
         theme="colored"
       />
       {showServerErrorModal ? (
-        <ErrorModal message={error} onRefresh={() => window.location.reload()} />
+        <ErrorModal
+          message={error}
+          onRefresh={() => {
+            clearSessionFromStorage();
+            window.location.reload();
+          }}
+        />
       ) : null}
       {roundResult !== null ? (
         <OnlineRoundResultModal
