@@ -262,13 +262,12 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     const game = games.get(roomId);
     if (!game || game.status === GAME_STATUS.CANCELLED) {
-      emitError(socket, 'Game not found.');
       return;
     }
 
     const restored = game.restorePlayer(playerId);
     if (!restored) {
-      emitError(socket, 'Could not rejoin.');
+      emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
       return;
     }
 
@@ -297,7 +296,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     } else if (game.status === GAME_STATUS.LOBBY) {
       const player = game.getPlayerById(playerId);
       if (!player) {
-        emitError(socket, 'Could not rejoin.');
+        emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
         return;
       }
 

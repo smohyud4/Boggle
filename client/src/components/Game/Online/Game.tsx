@@ -29,7 +29,8 @@ function OnlineGame() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [canStart, setCanStart] = useState(false);
-  const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
+  const [error, setError] = useState<string | undefined>(undefined);
   const [isWaitingOnGame, setIsWaitingOnGame] = useState(false);
   const [totalRounds, setTotalRounds] = useState(0);
   const [showServerErrorModal, setShowServerErrorModal] = useState(false);
@@ -51,12 +52,15 @@ function OnlineGame() {
       setIsWaitingOnGame(payload.waitingOnGame);
       setTotalRounds(payload.totalRounds);
       setIsWaitingRoom(true);
-      setError('');
+      setFormError('');
       setIsSubmitting({
         join: false,
         create: false,
         startGame: false,
       });
+
+      localStorage.setItem('player_id', payload.playerId);
+      localStorage.setItem('room_id', payload.roomId);
 
       searchParams.delete('room');
       const newUrl = `${window.location.origin}${window.location.pathname}`;
@@ -92,7 +96,7 @@ function OnlineGame() {
 
     const onError = (payload: ErrorPayload) => {
       if (payload?.type === 'form_error') {
-        setError(payload.message || 'Something went wrong.');
+        setFormError(payload.message || 'Something went wrong.');
         setIsSubmitting({
           join: false,
           create: false,
@@ -100,6 +104,10 @@ function OnlineGame() {
         });
         setIsAdvancingRound(false);
         return;
+      }
+
+      if (payload?.type === 'connection_error') {
+        setError(payload.message);
       }
 
       setShowServerErrorModal(true);
@@ -117,6 +125,22 @@ function OnlineGame() {
         hideProgressBar: false,
       });
     };
+
+    socket.on('disconnect', () => {
+      setFormError('Trying to reconnect...');
+    });
+
+    socket.on('connect', () => {
+      const formerPlayerId = localStorage.getItem('player_id');
+      const formerRoomId = localStorage.getItem('room_id');
+
+      if (formerPlayerId && formerRoomId) {
+        socket.emit(SOCKET_EVENTS.REJOIN_ROOM, {
+          playerId: formerPlayerId,
+          roomId: formerRoomId,
+        });
+      }
+    });
 
     socket.on(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
     socket.on(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
@@ -142,11 +166,11 @@ function OnlineGame() {
     const trimmedRoomCode = roomCode.trim().toUpperCase();
 
     if (!trimmedName || !trimmedRoomCode) {
-      setError('Player name and room code are required.');
+      setFormError('Player name and room code are required.');
       return;
     }
 
-    setError('');
+    setFormError('');
     setIsSubmitting((prev) => ({ ...prev, join: true }));
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
@@ -168,18 +192,18 @@ function OnlineGame() {
     const sanitizedRounds = Math.max(1, Math.floor(rounds));
 
     if (!trimmedName) {
-      setError('Player name is required.');
+      setFormError('Player name is required.');
       return;
     }
 
     if (!Number.isFinite(sanitizedRounds) || sanitizedRounds < 1) {
-      setError('Rounds must be a valid number.');
+      setFormError('Rounds must be a valid number.');
       return;
     }
 
     const createdRoomCode = generateRoomCode();
 
-    setError('');
+    setFormError('');
     setIsSubmitting((prev) => ({ ...prev, create: true }));
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
@@ -194,7 +218,7 @@ function OnlineGame() {
   const handleStartGame = () => {
     if (!isAdmin || !roomId) return;
 
-    setError('');
+    setFormError('');
     setIsSubmitting((prev) => ({ ...prev, startGame: true }));
     socket.emit(SOCKET_EVENTS.START_GAME, { roomId });
   };
@@ -204,7 +228,7 @@ function OnlineGame() {
       return;
     }
 
-    setError('');
+    setFormError('');
     setIsAdvancingRound(true);
     socket.emit(SOCKET_EVENTS.BEGIN_ROUND, { roomId });
   };
@@ -244,7 +268,7 @@ function OnlineGame() {
             onCreate={handleCreate}
           />
         )}
-        {error && <div className="error-display">{error}</div>}
+        {formError && <div className="error-display">{formError}</div>}
       </main>
       <ToastContainer
         position="top-center"
@@ -252,7 +276,9 @@ function OnlineGame() {
         hideProgressBar={true}
         theme="colored"
       />
-      {showServerErrorModal ? <ErrorModal onRefresh={() => window.location.reload()} /> : null}
+      {showServerErrorModal ? (
+        <ErrorModal message={error} onRefresh={() => window.location.reload()} />
+      ) : null}
       {roundResult !== null ? (
         <OnlineRoundResultModal
           roundResult={roundResult}
