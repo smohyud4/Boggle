@@ -1,12 +1,19 @@
 .arrow {
   color: var(--primary-navy);
-  font-size: 32px;
   position: absolute;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 10;
   margin: 0;
   padding: 0;
+}
+
+.arrow-4 {
+  font-size: 32px;
+}
+
+.arrow-5 {
+  font-size: 26px;
 }
 
 .arrow-icon {

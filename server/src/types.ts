@@ -4,9 +4,8 @@ export type Board = Record<number, string[]>;
 
 export type GameInitializer = {
   roomId: string;
-  boards: string[][];
   totalRounds?: number;
-  scoringParams?: Record<number, number>;
+  boardDimension?: number;
 };
 
 export type PlayerSnapshot = {
@@ -26,7 +25,7 @@ export type JoinRoomPayload = {
   playerName: string;
   create?: boolean;
   totalRounds?: number;
-  scoringParams?: Record<number, number>;
+  boardDimension?: number;
 };
 
 export type StartGamePayload = {

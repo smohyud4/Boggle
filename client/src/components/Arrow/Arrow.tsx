@@ -27,11 +27,15 @@ export type ArrowProps = {
   direction: ArrowDirection;
   top: string;
   left: string;
+  boardDimension: number;
 };
 
-export default function Arrow({ direction, top, left }: ArrowProps) {
+export default function Arrow({ direction, top, left, boardDimension }: ArrowProps) {
   return (
-    <p className="arrow" style={{ position: 'absolute', top: top, left: left }}>
+    <p
+      className={`arrow arrow-${boardDimension}`}
+      style={{ position: 'absolute', top: top, left: left }}
+    >
       {arrows[direction]}
     </p>
   );

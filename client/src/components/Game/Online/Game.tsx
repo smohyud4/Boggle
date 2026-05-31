@@ -16,7 +16,6 @@ import type {
   LobbyPlayer,
 } from '../../../types/payload';
 import { ToastContainer, toast } from 'react-toastify';
-import type { ScoringType } from '../../../types/payload';
 import '../index.css';
 import { generateRoomCode } from '../../../utils/game';
 import Header from '../../Header/Header';
@@ -208,11 +207,11 @@ function OnlineGame() {
   const handleCreate = ({
     name,
     rounds,
-    scoringType,
+    boardDimension,
   }: {
     name: string;
     rounds: number;
-    scoringType: ScoringType;
+    boardDimension: number;
   }) => {
     const trimmedName = name.trim();
     const sanitizedRounds = Math.max(1, Math.floor(rounds));
@@ -237,7 +236,7 @@ function OnlineGame() {
       playerName: trimmedName,
       create: true,
       totalRounds: sanitizedRounds,
-      ...(scoringType === 'equal' ? { scoringParams: {} } : {}),
+      boardDimension,
     });
   };
 
@@ -271,7 +270,6 @@ function OnlineGame() {
               round={gameInfo.round}
               totalRounds={gameInfo.totalRounds}
               board={gameInfo.board}
-              scoringParams={gameInfo.scoringParams}
               expiresAt={gameInfo.expiresAt}
             />
           </>
