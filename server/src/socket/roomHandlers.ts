@@ -402,7 +402,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    game.addWords(socket.id, normalizeWords(words), game.round);
+    game.addWords(socket.id, normalizeWords(words, game.boardDimension), game.round);
   });
 
   socket.on(EVENTS.LEAVE_ROOM, (payload: LeaveRoomPayload = {}) => {

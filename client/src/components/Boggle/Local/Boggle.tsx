@@ -30,6 +30,7 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
   );
 
   const validWords = useWordList();
+  const MIN_LENGTH = boardDimension === 5 ? 4 : 3;
 
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
@@ -162,7 +163,12 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
   };
 
   const isValidWord = (word: string) => {
-    return !foundWords.includes(word) && validWords.has(word) && canSpell(board, word);
+    return (
+      word.length >= MIN_LENGTH &&
+      !foundWords.includes(word) &&
+      validWords.has(word) &&
+      canSpell(board, word)
+    );
   };
 
   const handleCheckWord = () => {
@@ -191,7 +197,7 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
 
     selectionActiveRef.current = false;
 
-    if (validWords.has(word) && !foundWords.includes(word)) {
+    if (word.length >= MIN_LENGTH && validWords.has(word) && !foundWords.includes(word)) {
       const score = getWordScore(word, boardDimension);
 
       setFoundWords((prev) => [word, ...prev]);

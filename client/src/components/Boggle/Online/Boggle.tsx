@@ -36,6 +36,8 @@ function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProp
   const ROWS = Math.sqrt(board.length);
   const COLS = ROWS;
 
+  const MIN_LENGTH = ROWS === 5 ? 4 : 3;
+
   useEffect(() => {
     const handleOrientationChange = (e: MediaQueryListEvent) => {
       setIsPortrait(e.matches);
@@ -157,7 +159,12 @@ function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProp
   };
 
   const isValidWord = (word: string) => {
-    return !foundWords.includes(word) && validWords.has(word) && canSpell(board, word);
+    return (
+      word.length >= MIN_LENGTH &&
+      !foundWords.includes(word) &&
+      validWords.has(word) &&
+      canSpell(board, word)
+    );
   };
 
   const handleCheckWord = () => {
@@ -191,7 +198,7 @@ function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProp
 
     selectionActiveRef.current = false;
 
-    if (validWords.has(word) && !foundWords.includes(word)) {
+    if (word.length >= MIN_LENGTH && validWords.has(word) && !foundWords.includes(word)) {
       const score = getWordScore(word, ROWS);
 
       socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
