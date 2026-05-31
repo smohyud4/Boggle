@@ -1,3 +1,4 @@
+import { Server, Socket } from 'socket.io';
 import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
 import type { GameInitializer, GameStatus, RoundResult } from '../types.js';
 import { generateBoards } from '../utils/game.js';
@@ -14,6 +15,7 @@ export class Game {
   roundSubmissions: Map<number, Map<string, Set<string>>>;
   roundResults: Map<number, Map<string, RoundResult>>;
   roundExpiresAt: number | null;
+  gracePeriodIds: Map<string, NodeJS.Timeout>;
 
   constructor(payload: GameInitializer) {
     const {
@@ -32,6 +34,7 @@ export class Game {
     this.status = GAME_STATUS.LOBBY;
     this.roundSubmissions = new Map();
     this.roundResults = new Map();
+    this.gracePeriodIds = new Map();
     this.roundExpiresAt = null;
   }
 
@@ -43,9 +46,14 @@ export class Game {
     this.players.push(player);
   }
 
+  getPlayerById(playerId: string) {
+    return this.players.find((player) => player.id === playerId);
+  }
+
   removePlayerById(playerId: string): boolean {
     const previousLength = this.players.length;
     this.players = this.players.filter((player) => player.id !== playerId);
+    this.gracePeriodIds.delete(playerId);
     return this.players.length !== previousLength;
   }
 
@@ -213,5 +221,29 @@ export class Game {
       if (playerResult) total += playerResult.acceptedWords.length;
     }
     return total;
+  }
+
+  beginGracePeriod(
+    removePermanently: any,
+    playerId: string,
+    io: Server,
+    reason: 'left' | 'disconnected' = 'left',
+  ) {
+    this.restorePlayer(playerId);
+
+    const timeOutId = setTimeout(() => {
+      removePermanently(io, playerId, this.roomId, reason);
+    }, 60 * 1000);
+
+    this.gracePeriodIds.set(playerId, timeOutId);
+  }
+
+  restorePlayer(playerId: string): boolean {
+    const timeout = this.gracePeriodIds.get(playerId);
+    if (!timeout) return false;
+
+    clearTimeout(timeout);
+    this.gracePeriodIds.delete(playerId);
+    return true;
   }
 }

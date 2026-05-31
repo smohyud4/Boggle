@@ -33,7 +33,6 @@ export function ensureAdmin(players: Player[]): void {
 
 export function shouldCancelInProgressGame(game: Game): boolean {
   return (
-    game.status === GAME_STATUS.IN_PROGRESS &&
-    game.players.length < GAME_CONFIG.MIN_PLAYERS_TO_START
+    game.status !== GAME_STATUS.LOBBY && game.players.length < GAME_CONFIG.MIN_PLAYERS_TO_START
   );
 }
