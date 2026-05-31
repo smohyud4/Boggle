@@ -1,4 +1,4 @@
-export type GameStatus = 'lobby' | 'in_progress' | 'completed' | 'cancelled';
+export type GameStatus = 'lobby' | 'round_in_progress' | 'round_over' | 'completed' | 'cancelled';
 
 export type Board = Record<number, string[]>;
 

@@ -91,33 +91,7 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
   }
 
   const round = game.round;
-  const finalRound = round >= game.totalRounds;
-  const resultMap = game.scoreRound();
-
-  const playerResults = game.players
-    .map((player) => {
-      const roundEntry = resultMap?.get(player.id) || {
-        submittedWords: [],
-        acceptedWords: [],
-        points: 0,
-      };
-
-      return {
-        playerId: player.id,
-        name: player.name,
-        submittedWords: roundEntry.submittedWords,
-        acceptedWords: roundEntry.acceptedWords,
-        points: roundEntry.points,
-        totalWords: game.getTotalWordsById(player.id),
-        totalScore: game.getTotalScoreById(player.id),
-      };
-    })
-    .sort((a, b) => {
-      if (!finalRound) {
-        return a.name.localeCompare(b.name);
-      }
-      return b.totalScore - a.totalScore || b.totalWords - a.totalWords;
-    });
+  const playerResults = game.getPlayerResults(round);
 
   io.to(roomId).emit(EVENTS.ROUND_RESULT, {
     roomId,
@@ -125,8 +99,6 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
     reason,
     results: playerResults,
   });
-
-  if (finalRound) game.status = GAME_STATUS.COMPLETED;
 }
 
 function removeSocketFromRoom(
@@ -174,12 +146,6 @@ function removeSocketFromRoom(
       roomId,
       reason: 'not_enough_players',
     });
-  } else if (
-    game.status === GAME_STATUS.IN_PROGRESS &&
-    game.roundSubmissions.has(game.round) &&
-    game.allActivePlayersSubmitted(game.round)
-  ) {
-    settleRound(io, roomId, 'all_submitted');
   }
 
   broadcastLobby(io, roomId);
@@ -239,7 +205,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     const duplicateName = Array.from(waitingRoom.values()).some(
-      (player) => player.name.toLowerCase() === normalizedName.toLowerCase(),
+      (player) => player.name === normalizedName,
     );
 
     if (duplicateName) {

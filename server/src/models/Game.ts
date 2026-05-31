@@ -64,12 +64,12 @@ export class Game {
   }
 
   start(): void {
-    this.status = GAME_STATUS.IN_PROGRESS;
     this.round = 0;
     this.initializeRound(this.round);
   }
 
   initializeRound(round = this.round): void {
+    this.status = GAME_STATUS.ROUND_IN_PROGRESS;
     this.roundSubmissions.set(round, new Map());
   }
 
@@ -106,8 +106,8 @@ export class Game {
     return this.scoringParams[word.length] || 0;
   }
 
-  scoreRound() {
-    let roundWordsByPlayer = this.roundSubmissions.get(this.round);
+  scoreRound(round = this.round) {
+    let roundWordsByPlayer = this.roundSubmissions.get(round);
     if (!roundWordsByPlayer) return;
 
     const wordFreq = new Map<string, number>();
@@ -138,8 +138,39 @@ export class Game {
       });
     }
 
-    this.roundResults.set(this.round, results);
+    this.roundResults.set(round, results);
     return results;
+  }
+
+  getPlayerResults(round = this.round) {
+    const resultMap = this.scoreRound(round);
+    const finalRound = round >= this.totalRounds;
+    this.status = finalRound ? GAME_STATUS.COMPLETED : GAME_STATUS.ROUND_OVER;
+
+    return this.players
+      .map((player) => {
+        const roundEntry = resultMap?.get(player.id) || {
+          submittedWords: [],
+          acceptedWords: [],
+          points: 0,
+        };
+
+        return {
+          playerId: player.id,
+          name: player.name,
+          submittedWords: roundEntry.submittedWords,
+          acceptedWords: roundEntry.acceptedWords,
+          points: roundEntry.points,
+          totalWords: this.getTotalWordsById(player.id),
+          totalScore: this.getTotalScoreById(player.id),
+        };
+      })
+      .sort((a, b) => {
+        if (!finalRound) {
+          return a.name.localeCompare(b.name);
+        }
+        return b.totalScore - a.totalScore || b.totalWords - a.totalWords;
+      });
   }
 
   getPlayerScore(name: string): number {
