@@ -1,5 +1,4 @@
 export type FormMode = 'join' | 'create';
-export type ScoringType = 'default' | 'equal';
 
 export type RoomJoinedPayload = {
   roomId: string;
@@ -30,7 +29,6 @@ export type RoundStartPayload = {
   round: number;
   totalRounds: number;
   board: string[];
-  scoringParams: Record<number, number>;
   expiresAt: number;
 };
 

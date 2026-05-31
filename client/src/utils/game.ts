@@ -1,4 +1,6 @@
-const BOGGLE_DICE: Record<number, string[]> = {
+type BoggleDice = Record<number, string[]>;
+
+const BOGGLE_4x4: BoggleDice = {
   1: ['r', 'i', 'f', 'o', 'b', 'x'],
   2: ['i', 'f', 'e', 'h', 'e', 'y'],
   3: ['d', 'e', 'n', 'o', 'w', 's'],
@@ -17,9 +19,59 @@ const BOGGLE_DICE: Record<number, string[]> = {
   16: ['p', 'a', 'c', 'e', 'm', 'd'],
 };
 
-export function generateBoard(): string[] {
+const BOGGLE_5x5: BoggleDice = {
+  1: ['s', 'y', 'r', 'f', 'p', 'i'],
+  2: ['c', 'l', 'i', 't', 'i', 'e'],
+  3: ['k', 'i', 'qu', 'w', 'l', 'u'],
+  4: ['o', 'l', 'd', 'n', 'h', 'h'],
+  5: ['t', 'i', 't', 'i', 'e', 'i'],
+  6: ['c', 't', 'i', 's', 'e', 'p'],
+  7: ['a', 'a', 'a', 'r', 'f', 's'],
+  8: ['i', 'y', 'a', 'f', 'r', 's'],
+  9: ['n', 'l', 'h', 'd', 'r', 'o'],
+  10: ['m', 'g', 'n', 'a', 'e', 'n'],
+  11: ['n', 'c', 'c', 's', 'e', 't'],
+  12: ['e', 'g', 'u', 'e', 'a', 'm'],
+  13: ['a', 'd', 'n', 'n', 'n', 'e'],
+  14: ['h', 'r', 'l', 'h', 'o', 'd'],
+  15: ['p', 'e', 'i', 'l', 'c', 't'],
+  16: ['o', 't', 'o', 'u', 'w', 'n'],
+  17: ['t', 'n', 'h', 'd', 'd', 'o'],
+  18: ['t', 't', 't', 'o', 'm', 'e'],
+  19: ['a', 'a', 'e', 'e', 'e', 'e'],
+  20: ['s', 's', 's', 'e', 'n', 'u'],
+  21: ['t', 'o', 'o', 'o', 'u', 't'],
+  22: ['e', 'k', 'z', 'x', 'b', 'j'],
+  23: ['s', 'f', 'r', 'i', 'a', 'a'],
+  24: ['r', 'o', 'r', 'g', 'v', 'w'],
+  25: ['an', 'in', 'er', 'he', 'qu', 'th'],
+};
+
+const BOGGLE_BOARDS: Record<number, BoggleDice> = {
+  4: BOGGLE_4x4,
+  5: BOGGLE_5x5,
+};
+
+const BOGGLE_SCORING_PARAMS: Record<number, Record<number, number>> = {
+  4: {
+    3: 1,
+    4: 1,
+    5: 2,
+    6: 3,
+    7: 5,
+  },
+  5: {
+    3: 1,
+    4: 2,
+    5: 3,
+    6: 4,
+    7: 5,
+  },
+};
+
+export function generateBoard(n: number): string[] {
   const board: string[] = [];
-  const numbers = Array.from({ length: 16 }, (_, i) => i + 1);
+  const numbers = Array.from({ length: n * n }, (_, i) => i + 1);
 
   for (let i = numbers.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -27,7 +79,7 @@ export function generateBoard(): string[] {
   }
 
   for (const num of numbers) {
-    const dice = BOGGLE_DICE[num];
+    const dice = BOGGLE_BOARDS[n][num];
     board.push(dice[Math.floor(Math.random() * dice.length)]);
   }
 
@@ -36,6 +88,11 @@ export function generateBoard(): string[] {
 
 export function generateRoomCode(): string {
   return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+export function getWordScore(word: string, dimension: number) {
+  if (word.length >= 8) return 11;
+  return BOGGLE_SCORING_PARAMS[dimension][word.length] || 0;
 }
 
 export function formatTime(time: number): string {

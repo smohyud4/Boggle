@@ -119,8 +119,15 @@
 
 .loader-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+}
+
+.loader-container-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.loader-container-5 {
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .loader {

@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Arrow, { type ArrowDirection, type ArrowProps } from '../../Arrow/Arrow';
-import { generateBoard, canSpell, formatTime } from '../../../utils/game';
+import { generateBoard, canSpell, formatTime, getWordScore } from '../../../utils/game';
 import { useWordList } from '../../../context/WordListContext';
 import LocalRoundResultModal from '../../RoundResultModal/Local/RoundResultModal';
 import '../index.css';
 
 const ROUND_LENGTH = 180;
 const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
+const MIN_LENGTH = 3;
 
 function LocalBoggle() {
-  const [board, setBoard] = useState(generateBoard());
+  const [boardDimension, setBoardDimension] = useState(4);
+  const [board, setBoard] = useState(generateBoard(boardDimension));
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [totalScore, setTotalScore] = useState(0);
@@ -64,26 +66,27 @@ function LocalBoggle() {
     return () => clearInterval(intervalId);
   }, [roundOver]);
 
+  const handleChangeBoard = (dimension: number) => {
+    setBoardDimension(dimension);
+    setWord('');
+    setFoundWords([]);
+    setCurrScore(0);
+    setHighlighted([]);
+    setPrevIndex(-1);
+    setRoundOver(false);
+    setArrows([]);
+    setSecondsLeft(ROUND_LENGTH);
+    setBoard(generateBoard(dimension));
+    roundSubmittedRef.current = false;
+    selectionActiveRef.current = false;
+  };
+
   const triggerScoreAnimation = (points: number) => {
     const id = Date.now() + Math.floor(Math.random() * 1000);
     setScoreAnimations((prev) => [...prev, { id, points }]);
     window.setTimeout(() => {
       setScoreAnimations((prev) => prev.filter((a) => a.id !== id));
     }, 1000);
-  };
-
-  const getWordScore = (candidate: string) => {
-    const scoringParams: Record<number, number> = {
-      3: 1,
-      4: 1,
-      5: 2,
-      6: 3,
-      7: 5,
-    };
-
-    if (Object.keys(scoringParams).length === 0) return 1;
-    if (candidate.length >= 8) return 11;
-    return scoringParams[candidate.length] || 0;
   };
 
   const validMove = (index: number) => {
@@ -137,7 +140,7 @@ function LocalBoggle() {
       direction = 'top-left';
     }
 
-    setArrows((prev) => [...prev, { direction, top, left }]);
+    setArrows((prev) => [...prev, { direction, top, left, boardDimension }]);
   };
 
   const startSelection = (letter: string, index: number) => {
@@ -157,7 +160,12 @@ function LocalBoggle() {
   };
 
   const isValidWord = (word: string) => {
-    return !foundWords.includes(word) && validWords.has(word) && canSpell(board, word);
+    return (
+      word.length >= MIN_LENGTH &&
+      !foundWords.includes(word) &&
+      validWords.has(word) &&
+      canSpell(board, word)
+    );
   };
 
   const handleCheckWord = () => {
@@ -169,7 +177,7 @@ function LocalBoggle() {
       return;
     }
 
-    const score = getWordScore(word);
+    const score = getWordScore(word, boardDimension);
 
     setFoundWords((prev) => [word, ...prev]);
     setCurrScore((prev) => prev + score);
@@ -186,8 +194,8 @@ function LocalBoggle() {
 
     selectionActiveRef.current = false;
 
-    if (validWords.has(word) && !foundWords.includes(word)) {
-      const score = getWordScore(word);
+    if (word.length >= MIN_LENGTH && validWords.has(word) && !foundWords.includes(word)) {
+      const score = getWordScore(word, boardDimension);
 
       setFoundWords((prev) => [word, ...prev]);
       setCurrScore((prev) => prev + score);
@@ -249,7 +257,7 @@ function LocalBoggle() {
     setRoundOver(false);
     setArrows([]);
     setSecondsLeft(ROUND_LENGTH);
-    setBoard(generateBoard());
+    setBoard(generateBoard(boardDimension));
     roundSubmittedRef.current = false;
     selectionActiveRef.current = false;
   };
@@ -291,14 +299,18 @@ function LocalBoggle() {
         </div>
 
         <div className="game-grid-container">
-          <div className="letter-grid" onPointerLeave={endSelection} onTouchMove={handleTouchMove}>
+          <div
+            className={`letter-grid letter-grid-${boardDimension}`}
+            onPointerLeave={endSelection}
+            onTouchMove={handleTouchMove}
+          >
             {board.map((letter, index) => (
-              <div key={index}>
+              <div key={index} className={`dice-container dice-container-${boardDimension}`}>
                 <span
                   ref={(el) => {
                     letterRefs.current[index] = el;
                   }}
-                  className={`letter ${highlighted.includes(index) ? 'active' : ''}`}
+                  className={`letter letter-${boardDimension} ${highlighted.includes(index) ? 'active' : ''}`}
                   onPointerDown={() => startSelection(letter, index)}
                   onPointerEnter={() => continueSelection(letter, index)}
                   onPointerUp={endSelection}
@@ -327,11 +339,21 @@ function LocalBoggle() {
             </div>
           </div>
         </div>
+        <div id="board-changer">
+          <button onClick={() => handleChangeBoard(4)}>4x4</button>
+          <button onClick={() => handleChangeBoard(5)}>5x5</button>
+        </div>
       </div>
 
       {createPortal(
         arrows.map((arrow, index) => (
-          <Arrow key={index} direction={arrow.direction} top={arrow.top} left={arrow.left} />
+          <Arrow
+            key={index}
+            direction={arrow.direction}
+            top={arrow.top}
+            left={arrow.left}
+            boardDimension={boardDimension}
+          />
         )),
         document.body,
       )}

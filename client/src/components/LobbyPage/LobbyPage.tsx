@@ -2,14 +2,12 @@ import CreateForm from '../CreateForm/CreateForm';
 import JoinForm from '../JoinForm/JoinForm';
 import './LobbyPage.css';
 
-type ScoringType = 'default' | 'equal';
-
 type LobbyPageProps = {
   isJoinSubmitting: boolean;
   isCreateSubmitting: boolean;
   controlledRoomCode?: string;
   onJoin: (payload: { name: string; roomCode: string }) => void;
-  onCreate: (payload: { name: string; rounds: number; scoringType: ScoringType }) => void;
+  onCreate: (payload: { name: string; rounds: number; boardDimension: number }) => void;
 };
 
 function LobbyPage({
