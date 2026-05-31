@@ -11,6 +11,7 @@ import '../index.css';
 type GameProps = RoundStartPayload;
 
 const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
+const MIN_LENGTH = 3;
 
 function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProps) {
   const [word, setWord] = useState('');
@@ -35,8 +36,6 @@ function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProp
 
   const ROWS = Math.sqrt(board.length);
   const COLS = ROWS;
-
-  const MIN_LENGTH = ROWS === 5 ? 4 : 3;
 
   useEffect(() => {
     const handleOrientationChange = (e: MediaQueryListEvent) => {

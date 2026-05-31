@@ -77,7 +77,7 @@ export function generateBoards(totalRounds: number, dimension: number): string[]
   return Array.from({ length: totalRounds }, () => generateBoard(dimension));
 }
 
-export function normalizeWords(words: unknown, dimension: number): string[] {
+export function normalizeWords(words: unknown): string[] {
   if (!Array.isArray(words)) return [];
 
   const seen = new Set<string>();
@@ -90,8 +90,8 @@ export function normalizeWords(words: unknown, dimension: number): string[] {
       .trim()
       .toUpperCase()
       .replace(/[^A-Z]/g, '');
+
     if (cleaned.length < 3) continue;
-    if (dimension === 5 && cleaned.length < 4) continue;
     if (seen.has(cleaned)) continue;
 
     seen.add(cleaned);

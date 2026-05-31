@@ -8,12 +8,10 @@ import '../index.css';
 
 const ROUND_LENGTH = 180;
 const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
+const MIN_LENGTH = 3;
 
-type LocalBoggleProps = {
-  boardDimension: number;
-};
-
-function LocalBoggle({ boardDimension }: LocalBoggleProps) {
+function LocalBoggle() {
+  const [boardDimension, setBoardDimension] = useState(4);
   const [board, setBoard] = useState(generateBoard(boardDimension));
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
@@ -30,7 +28,6 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
   );
 
   const validWords = useWordList();
-  const MIN_LENGTH = boardDimension === 5 ? 4 : 3;
 
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
@@ -69,8 +66,8 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
     return () => clearInterval(intervalId);
   }, [roundOver]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const handleChangeBoard = (dimension: number) => {
+    setBoardDimension(dimension);
     setWord('');
     setFoundWords([]);
     setCurrScore(0);
@@ -79,10 +76,10 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
     setRoundOver(false);
     setArrows([]);
     setSecondsLeft(ROUND_LENGTH);
-    setBoard(generateBoard(boardDimension));
+    setBoard(generateBoard(dimension));
     roundSubmittedRef.current = false;
     selectionActiveRef.current = false;
-  }, [boardDimension]);
+  };
 
   const triggerScoreAnimation = (points: number) => {
     const id = Date.now() + Math.floor(Math.random() * 1000);
@@ -341,6 +338,10 @@ function LocalBoggle({ boardDimension }: LocalBoggleProps) {
               <p className="score-value">{currScore}</p>
             </div>
           </div>
+        </div>
+        <div id="board-changer">
+          <button onClick={() => handleChangeBoard(4)}>4x4</button>
+          <button onClick={() => handleChangeBoard(5)}>5x5</button>
         </div>
       </div>
 
