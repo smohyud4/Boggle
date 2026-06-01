@@ -14,11 +14,11 @@ export default function ErrorModal({ message, onRefresh }: Props) {
           <AlertCircle size={48} />
         </div>
         <div className="error-modal-message">
-          {message || 'Sorry, an error has occurred on the server'}
+          {message ?? 'Sorry, an error has occurred on the server'}
         </div>
         <div className="error-modal-actions">
           <button className="error-modal-button" onClick={onRefresh}>
-            Refresh page
+            Exit Game
           </button>
         </div>
       </div>

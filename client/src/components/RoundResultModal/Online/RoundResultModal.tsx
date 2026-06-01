@@ -5,6 +5,7 @@ import { socket } from '../../../socket/client';
 import { SOCKET_EVENTS } from '../../../socket/events';
 import LeaderBoard from '../../Leaderboard/Leaderboard';
 import '../index.css';
+import { clearSessionFromStorage } from '../../../utils/session';
 
 type RoundResultModalProps = {
   roundResult: RoundResultPayload;
@@ -29,6 +30,7 @@ function OnlineRoundResultModal({
   const leaderboardEntries = roundResult.results;
 
   const handleRefresh = () => {
+    clearSessionFromStorage();
     window.location.reload();
   };
 

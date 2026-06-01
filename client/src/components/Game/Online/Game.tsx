@@ -19,6 +19,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import '../index.css';
 import { generateRoomCode } from '../../../utils/game';
 import Header from '../../Header/Header';
+import {
+  saveSessionToStorage,
+  getSessionFromStorage,
+  clearSessionFromStorage,
+} from '../../../utils/session';
 
 const searchParams = new URLSearchParams(window.location.search);
 
@@ -28,7 +33,8 @@ function OnlineGame() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
   const [canStart, setCanStart] = useState(false);
-  const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
+  const [error, setError] = useState<string | undefined>(undefined);
   const [isWaitingOnGame, setIsWaitingOnGame] = useState(false);
   const [totalRounds, setTotalRounds] = useState(0);
   const [showServerErrorModal, setShowServerErrorModal] = useState(false);
@@ -50,12 +56,14 @@ function OnlineGame() {
       setIsWaitingOnGame(payload.waitingOnGame);
       setTotalRounds(payload.totalRounds);
       setIsWaitingRoom(true);
-      setError('');
+      setFormError('');
       setIsSubmitting({
         join: false,
         create: false,
         startGame: false,
       });
+
+      saveSessionToStorage(payload.playerId, payload.roomId);
 
       searchParams.delete('room');
       const newUrl = `${window.location.origin}${window.location.pathname}`;
@@ -76,6 +84,7 @@ function OnlineGame() {
     const onRoundStart = (payload: RoundStartPayload) => {
       setRoundResult(null);
       setIsAdvancingRound(false);
+      setRoomId(payload.roomId);
       setGameInfo(payload);
     };
 
@@ -91,7 +100,7 @@ function OnlineGame() {
 
     const onError = (payload: ErrorPayload) => {
       if (payload?.type === 'form_error') {
-        setError(payload.message || 'Something went wrong.');
+        setFormError(payload.message || 'Something went wrong.');
         setIsSubmitting({
           join: false,
           create: false,
@@ -99,6 +108,10 @@ function OnlineGame() {
         });
         setIsAdvancingRound(false);
         return;
+      }
+
+      if (payload?.type === 'connection_error') {
+        setError(payload.message);
       }
 
       setShowServerErrorModal(true);
@@ -117,6 +130,40 @@ function OnlineGame() {
       });
     };
 
+    const onConnect = () => {
+      setFormError('');
+
+      const session = getSessionFromStorage();
+      if (session) {
+        socket.emit(SOCKET_EVENTS.REJOIN_ROOM, {
+          playerId: session.playerId,
+          roomId: session.roomId,
+        });
+      }
+    };
+
+    socket.on('disconnect', () => {
+      if (socket.active) {
+        setFormError('Trying to reconnect...');
+      } else {
+        clearSessionFromStorage();
+
+        setError('Could not reconnect.');
+        setShowServerErrorModal(true);
+        setIsSubmitting({
+          join: false,
+          create: false,
+          startGame: false,
+        });
+        setIsAdvancingRound(false);
+      }
+    });
+    socket.on('connect', onConnect);
+
+    if (socket.connected) {
+      onConnect();
+    }
+
     socket.on(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
     socket.on(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -126,6 +173,9 @@ function OnlineGame() {
     socket.on(SOCKET_EVENTS.WARNING_EVENT, onWarning);
 
     return () => {
+      socket.off('disconnect');
+      socket.off('connect', onConnect);
+
       socket.off(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
       socket.off(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
       socket.off(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -141,11 +191,11 @@ function OnlineGame() {
     const trimmedRoomCode = roomCode.trim().toUpperCase();
 
     if (!trimmedName || !trimmedRoomCode) {
-      setError('Player name and room code are required.');
+      setFormError('Player name and room code are required.');
       return;
     }
 
-    setError('');
+    setFormError('');
     setIsSubmitting((prev) => ({ ...prev, join: true }));
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
@@ -167,18 +217,18 @@ function OnlineGame() {
     const sanitizedRounds = Math.max(1, Math.floor(rounds));
 
     if (!trimmedName) {
-      setError('Player name is required.');
+      setFormError('Player name is required.');
       return;
     }
 
     if (!Number.isFinite(sanitizedRounds) || sanitizedRounds < 1) {
-      setError('Rounds must be a valid number.');
+      setFormError('Rounds must be a valid number.');
       return;
     }
 
     const createdRoomCode = generateRoomCode();
 
-    setError('');
+    setFormError('');
     setIsSubmitting((prev) => ({ ...prev, create: true }));
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
@@ -193,7 +243,7 @@ function OnlineGame() {
   const handleStartGame = () => {
     if (!isAdmin || !roomId) return;
 
-    setError('');
+    setFormError('');
     setIsSubmitting((prev) => ({ ...prev, startGame: true }));
     socket.emit(SOCKET_EVENTS.START_GAME, { roomId });
   };
@@ -203,7 +253,7 @@ function OnlineGame() {
       return;
     }
 
-    setError('');
+    setFormError('');
     setIsAdvancingRound(true);
     socket.emit(SOCKET_EVENTS.BEGIN_ROUND, { roomId });
   };
@@ -215,8 +265,8 @@ function OnlineGame() {
         {gameInfo !== null ? (
           <>
             <OnlineBoggle
-              key={`${roomId}-${gameInfo.round}`}
-              roomId={roomId}
+              key={`${gameInfo.roomId}-${gameInfo.round}`}
+              roomId={gameInfo.roomId}
               round={gameInfo.round}
               totalRounds={gameInfo.totalRounds}
               board={gameInfo.board}
@@ -242,7 +292,7 @@ function OnlineGame() {
             onCreate={handleCreate}
           />
         )}
-        {error && <div className="error-display">{error}</div>}
+        {formError && <div className="error-display">{formError}</div>}
       </main>
       <ToastContainer
         position="top-center"
@@ -250,7 +300,15 @@ function OnlineGame() {
         hideProgressBar={true}
         theme="colored"
       />
-      {showServerErrorModal ? <ErrorModal onRefresh={() => window.location.reload()} /> : null}
+      {showServerErrorModal ? (
+        <ErrorModal
+          message={error}
+          onRefresh={() => {
+            clearSessionFromStorage();
+            window.location.reload();
+          }}
+        />
+      ) : null}
       {roundResult !== null ? (
         <OnlineRoundResultModal
           roundResult={roundResult}

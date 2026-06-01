@@ -36,9 +36,10 @@ export const GAME_CONFIG: GAME_CONFIG_TYPE = {
   },
 };
 
-export const GAME_STATUS: Record<string, GameStatus> = {
-  LOBBY: 'lobby',
-  IN_PROGRESS: 'in_progress',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled',
-};
+export enum GAME_STATUS {
+  LOBBY = 'lobby',
+  ROUND_IN_PROGRESS = 'round_in_progress',
+  ROUND_OVER = 'round_over',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}

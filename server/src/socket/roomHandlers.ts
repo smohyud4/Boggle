@@ -84,39 +84,13 @@ function startRound(io: Server, roomId: string): void {
 
 function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_submitted'): void {
   const game = games.get(roomId);
-  if (!game || game.status !== GAME_STATUS.IN_PROGRESS) {
+  if (!game || game.status !== GAME_STATUS.ROUND_IN_PROGRESS) {
     broadCastError(io, roomId, 'Game not found.', { roomId });
     return;
   }
 
   const round = game.round;
-  const finalRound = round >= game.totalRounds;
-  const resultMap = game.scoreRound();
-
-  const playerResults = game.players
-    .map((player) => {
-      const roundEntry = resultMap?.get(player.id) || {
-        submittedWords: [],
-        acceptedWords: [],
-        points: 0,
-      };
-
-      return {
-        playerId: player.id,
-        name: player.name,
-        submittedWords: roundEntry.submittedWords,
-        acceptedWords: roundEntry.acceptedWords,
-        points: roundEntry.points,
-        totalWords: game.getTotalWordsById(player.id),
-        totalScore: game.getTotalScoreById(player.id),
-      };
-    })
-    .sort((a, b) => {
-      if (!finalRound) {
-        return a.name.localeCompare(b.name);
-      }
-      return b.totalScore - a.totalScore || b.totalWords - a.totalWords;
-    });
+  const playerResults = game.getPlayerResults(round);
 
   io.to(roomId).emit(EVENTS.ROUND_RESULT, {
     roomId,
@@ -124,13 +98,11 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
     reason,
     results: playerResults,
   });
-
-  if (finalRound) game.status = GAME_STATUS.COMPLETED;
 }
 
 function removeSocketFromRoom(
   io: Server,
-  socket: Socket,
+  id: string,
   roomId: string,
   reason: 'left' | 'disconnected' = 'left',
 ): void {
@@ -138,10 +110,9 @@ function removeSocketFromRoom(
   const game = games.get(roomId);
   if (!waitingRoom || !game) return;
 
-  const player = waitingRoom.get(socket.id);
-  waitingRoom.delete(socket.id);
-  socketRoomMap.delete(socket.id);
-  socket.leave(roomId);
+  const player = waitingRoom.get(id);
+  waitingRoom.delete(id);
+  socketRoomMap.delete(id);
 
   if (player) {
     game.removePlayerById(player.id);
@@ -173,15 +144,21 @@ function removeSocketFromRoom(
       roomId,
       reason: 'not_enough_players',
     });
-  } else if (
-    game.status === GAME_STATUS.IN_PROGRESS &&
-    game.roundSubmissions.has(game.round) &&
-    game.allActivePlayersSubmitted(game.round)
-  ) {
-    settleRound(io, roomId, 'all_submitted');
   }
 
   broadcastLobby(io, roomId);
+}
+
+function handleSocketDisconnect(
+  io: Server,
+  socket: Socket,
+  roomId: string,
+  reason: 'left' | 'disconnected' = 'left',
+) {
+  const game = games.get(roomId);
+  if (!game) return;
+
+  game.beginGracePeriod(removeSocketFromRoom, socket.id, io, reason);
 }
 
 export function registerRoomHandlers(io: Server, socket: Socket): void {
@@ -242,7 +219,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     const duplicateName = Array.from(waitingRoom.values()).some(
-      (player) => player.name.toLowerCase() === normalizedName.toLowerCase(),
+      (player) => player.name === normalizedName,
     );
 
     if (duplicateName) {
@@ -266,11 +243,79 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       roomId: normalizedRoomId,
       playerId: player.id,
       isAdmin: player.isAdmin,
-      waitingOnGame: game.status === GAME_STATUS.IN_PROGRESS,
+      waitingOnGame: game.status !== GAME_STATUS.LOBBY,
       totalRounds: game.totalRounds,
     });
 
     broadcastLobby(io, normalizedRoomId);
+  });
+
+  socket.on(EVENTS.REJOIN_ROOM, (payload: { playerId: string; roomId: string }) => {
+    const { playerId, roomId } = payload;
+
+    if (!playerId || typeof playerId !== 'string') {
+      emitError(socket, 'Invalid player id.');
+      return;
+    }
+
+    if (!roomId || typeof roomId !== 'string') {
+      emitError(socket, 'Invalid room id.');
+      return;
+    }
+
+    const game = games.get(roomId);
+    if (
+      !game ||
+      game.status === GAME_STATUS.CANCELLED ||
+      game.getPlayerById(playerId) === undefined
+    ) {
+      return;
+    }
+
+    const restored = game.restorePlayer(playerId);
+    if (!restored) {
+      emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
+      return;
+    }
+
+    socket.join(roomId);
+    socketRoomMap.set(playerId, socket.id);
+    const roundNumber = game.round;
+
+    if (game.status === GAME_STATUS.ROUND_IN_PROGRESS) {
+      socket.emit(EVENTS.ROUND_START, {
+        roomId,
+        round: roundNumber,
+        totalRounds: game.totalRounds,
+        board: game.getBoardForRound(roundNumber),
+        expiresAt: game.roundExpiresAt,
+      });
+    } else if (game.status === GAME_STATUS.COMPLETED || game.status === GAME_STATUS.ROUND_OVER) {
+      const playerResults = game.getPlayerResults(roundNumber);
+
+      socket.emit(EVENTS.ROUND_RESULT, {
+        roomId,
+        round: roundNumber,
+        reason: 'timer_expired',
+        results: playerResults,
+      });
+    } else if (game.status === GAME_STATUS.LOBBY) {
+      const player = game.getPlayerById(playerId);
+      if (!player) {
+        emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
+        return;
+      }
+
+      socket.emit(EVENTS.ROOM_JOINED, {
+        roomId: roomId,
+        playerId: player.id,
+        isAdmin: player.isAdmin,
+        waitingOnGame: game.status !== GAME_STATUS.LOBBY,
+        totalRounds: game.totalRounds,
+      });
+
+      broadcastLobby(io, roomId);
+    }
   });
 
   socket.on(EVENTS.START_GAME, (payload: StartGamePayload = {}) => {
@@ -326,7 +371,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    if (game.status !== GAME_STATUS.IN_PROGRESS) {
+    if (game.status !== GAME_STATUS.ROUND_OVER) {
       emitError(socket, 'Game is not in progress.', { roomId });
       return;
     }
@@ -384,7 +429,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    if (game.status !== GAME_STATUS.IN_PROGRESS) {
+    if (game.status !== GAME_STATUS.ROUND_IN_PROGRESS && game.status !== GAME_STATUS.ROUND_OVER) {
       return;
     }
 
@@ -408,12 +453,12 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
   socket.on(EVENTS.LEAVE_ROOM, (payload: LeaveRoomPayload = {}) => {
     const { roomId } = payload;
     if (!roomId || typeof roomId !== 'string') return;
-    removeSocketFromRoom(io, socket, roomId, 'left');
+    removeSocketFromRoom(io, socket.id, roomId, 'left');
   });
 
   socket.on('disconnect', () => {
     const roomId = socketRoomMap.get(socket.id);
     if (!roomId) return;
-    removeSocketFromRoom(io, socket, roomId, 'disconnected');
+    handleSocketDisconnect(io, socket, roomId, 'disconnected');
   });
 }

@@ -1,3 +1,4 @@
+import { Server, Socket } from 'socket.io';
 import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
 import type { GameInitializer, GameStatus, RoundResult } from '../types.js';
 import { generateBoards } from '../utils/game.js';
@@ -14,6 +15,7 @@ export class Game {
   roundSubmissions: Map<number, Map<string, Set<string>>>;
   roundResults: Map<number, Map<string, RoundResult>>;
   roundExpiresAt: number | null;
+  gracePeriodIds: Map<string, NodeJS.Timeout>;
 
   constructor(payload: GameInitializer) {
     const { roomId, totalRounds = GAME_CONFIG.TOTAL_ROUNDS, boardDimension = 4 } = payload;
@@ -27,6 +29,7 @@ export class Game {
     this.status = GAME_STATUS.LOBBY;
     this.roundSubmissions = new Map();
     this.roundResults = new Map();
+    this.gracePeriodIds = new Map();
     this.roundExpiresAt = null;
   }
 
@@ -38,9 +41,14 @@ export class Game {
     this.players.push(player);
   }
 
+  getPlayerById(playerId: string) {
+    return this.players.find((player) => player.id === playerId);
+  }
+
   removePlayerById(playerId: string): boolean {
     const previousLength = this.players.length;
     this.players = this.players.filter((player) => player.id !== playerId);
+    this.gracePeriodIds.delete(playerId);
     return this.players.length !== previousLength;
   }
 
@@ -59,12 +67,12 @@ export class Game {
   }
 
   start(): void {
-    this.status = GAME_STATUS.IN_PROGRESS;
     this.round = 0;
     this.initializeRound(this.round);
   }
 
   initializeRound(round = this.round): void {
+    this.status = GAME_STATUS.ROUND_IN_PROGRESS;
     this.roundSubmissions.set(round, new Map());
   }
 
@@ -100,8 +108,8 @@ export class Game {
     return GAME_CONFIG.SCORE_BY_LENGTH[this.boardDimension][word.length] || 0;
   }
 
-  scoreRound() {
-    let roundWordsByPlayer = this.roundSubmissions.get(this.round);
+  scoreRound(round = this.round) {
+    let roundWordsByPlayer = this.roundSubmissions.get(round);
     if (!roundWordsByPlayer) return;
 
     const wordFreq = new Map<string, number>();
@@ -132,8 +140,39 @@ export class Game {
       });
     }
 
-    this.roundResults.set(this.round, results);
+    this.roundResults.set(round, results);
     return results;
+  }
+
+  getPlayerResults(round = this.round) {
+    const resultMap = this.scoreRound(round);
+    const finalRound = round >= this.totalRounds;
+    this.status = finalRound ? GAME_STATUS.COMPLETED : GAME_STATUS.ROUND_OVER;
+
+    return this.players
+      .map((player) => {
+        const roundEntry = resultMap?.get(player.id) || {
+          submittedWords: [],
+          acceptedWords: [],
+          points: 0,
+        };
+
+        return {
+          playerId: player.id,
+          name: player.name,
+          submittedWords: roundEntry.submittedWords,
+          acceptedWords: roundEntry.acceptedWords,
+          points: roundEntry.points,
+          totalWords: this.getTotalWordsById(player.id),
+          totalScore: this.getTotalScoreById(player.id),
+        };
+      })
+      .sort((a, b) => {
+        if (!finalRound) {
+          return a.name.localeCompare(b.name);
+        }
+        return b.totalScore - a.totalScore || b.totalWords - a.totalWords;
+      });
   }
 
   getPlayerScore(name: string): number {
@@ -176,5 +215,29 @@ export class Game {
       if (playerResult) total += playerResult.acceptedWords.length;
     }
     return total;
+  }
+
+  beginGracePeriod(
+    removePermanently: any,
+    playerId: string,
+    io: Server,
+    reason: 'left' | 'disconnected' = 'left',
+  ) {
+    this.restorePlayer(playerId);
+
+    const timeOutId = setTimeout(() => {
+      removePermanently(io, playerId, this.roomId, reason);
+    }, 60 * 1000);
+
+    this.gracePeriodIds.set(playerId, timeOutId);
+  }
+
+  restorePlayer(playerId: string): boolean {
+    const timeout = this.gracePeriodIds.get(playerId);
+    if (!timeout) return false;
+
+    clearTimeout(timeout);
+    this.gracePeriodIds.delete(playerId);
+    return true;
   }
 }

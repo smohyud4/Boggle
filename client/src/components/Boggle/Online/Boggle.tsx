@@ -79,6 +79,17 @@ function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProp
     return () => window.clearInterval(timer);
   }, [expiresAt]);
 
+  useEffect(() => {
+    if (roundOver) {
+      socket.emit(SOCKET_EVENTS.SUBMIT_WORDS, {
+        roomId,
+        words: foundWords,
+        timeStamp: Date.now(),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roundOver, foundWords]);
+
   const triggerScoreAnimation = (points: number) => {
     const id = Date.now() + Math.floor(Math.random() * 1000);
     setScoreAnimations((prev) => [...prev, { id, points }]);
