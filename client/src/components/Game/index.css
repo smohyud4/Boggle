@@ -13,7 +13,7 @@
 
 .error-display {
   position: absolute;
-  bottom: 15%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--primary-navy);
@@ -37,5 +37,10 @@
 @media (max-width: 480px) {
   .app {
     padding: 5px;
+  }
+
+  .error-display {
+    font-size: 0.8rem;
+    padding: 10px 12px;
   }
 }
