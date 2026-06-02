@@ -163,7 +163,13 @@ function handleSocketDisconnect(
 
 export function registerRoomHandlers(io: Server, socket: Socket): void {
   socket.on(EVENTS.JOIN_ROOM, (payload: JoinRoomPayload) => {
-    const { roomId, playerName, create, totalRounds, boardDimension } = payload;
+    const {
+      roomId,
+      playerName,
+      create,
+      totalRounds = GAME_CONFIG.TOTAL_ROUNDS,
+      boardDimension,
+    } = payload;
 
     if (!roomId || typeof roomId !== 'string') {
       emitError(socket, 'Invalid room id.', { type: 'form_error' });
@@ -205,7 +211,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
       game = new Game({
         roomId: normalizedRoomId,
-        totalRounds,
+        totalRounds: Math.min(GAME_CONFIG.MAX_ROUNDS, totalRounds),
         boardDimension,
       });
 

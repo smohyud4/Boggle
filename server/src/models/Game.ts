@@ -24,7 +24,7 @@ export class Game {
     this.boardDimension = boardDimension;
     this.roomId = roomId;
     this.round = 0;
-    this.totalRounds = totalRounds;
+    this.totalRounds = Math.min(GAME_CONFIG.MAX_ROUNDS, totalRounds);
     this.players = [];
     this.status = GAME_STATUS.LOBBY;
     this.roundSubmissions = new Map();

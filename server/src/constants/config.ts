@@ -1,11 +1,10 @@
-import type { GameStatus } from '../types.js';
-
 export const PORT = Number(process.env.PORT || 3000);
 export const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
 type GAME_CONFIG_TYPE = {
   BOARD_SIZE: number;
   MAX_PLAYERS: number;
+  MAX_ROUNDS: number;
   MIN_PLAYERS_TO_START: number;
   TOTAL_ROUNDS: number;
   ROUND_SECONDS: number;
@@ -15,6 +14,7 @@ type GAME_CONFIG_TYPE = {
 export const GAME_CONFIG: GAME_CONFIG_TYPE = {
   BOARD_SIZE: 4,
   MAX_PLAYERS: 5,
+  MAX_ROUNDS: 6,
   MIN_PLAYERS_TO_START: 2,
   TOTAL_ROUNDS: 3,
   ROUND_SECONDS: 180,

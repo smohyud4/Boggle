@@ -48,7 +48,7 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
         <input
           type="number"
           min={1}
-          max={20}
+          max={6}
           value={rounds}
           onChange={(event) => setRounds(event.target.value)}
           required
