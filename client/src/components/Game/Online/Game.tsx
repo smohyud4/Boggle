@@ -144,7 +144,7 @@ function OnlineGame() {
 
     socket.on('disconnect', () => {
       if (socket.active) {
-        setFormError('Trying to reconnect...');
+        setFormError('Reconnecting...');
       } else {
         clearSessionFromStorage();
 

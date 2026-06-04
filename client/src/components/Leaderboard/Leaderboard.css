@@ -42,23 +42,24 @@
 }
 
 .leaderboard__list .--first {
-  background-color: #d4af37;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
+  background-color: var(--secondary-teal);
 }
+
 .leaderboard__list .--second {
   background-color: #c0c0c0;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
 }
+
 .leaderboard__list .--third {
   background-color: #cd7f32;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
 }
 
 .leaderboard__list .leaderboard__rank {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 999px;
 }
 
 .leaderboard .leaderboard__row:nth-child(even) {
@@ -135,5 +136,12 @@
 
   .leaderboard__score {
     grid-column: 2;
+  }
+}
+
+@media (max-width: 380px) {
+  .leaderboard__list .leaderboard__rank {
+    height: 20px;
+    min-width: 20px;
   }
 }
