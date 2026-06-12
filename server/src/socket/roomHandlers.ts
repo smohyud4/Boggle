@@ -240,9 +240,8 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const playerId = crypto.randomUUID();
     const player = new Player({
-      id: playerId,
+      id: crypto.randomUUID(),
       name: normalizedName,
       isAdmin: waitingRoom.size === 0,
     });
@@ -263,14 +262,6 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     broadcastLobby(io, normalizedRoomId);
   });
-
-  /**
-   * @bug
-   * On a second refresh, the new client's socketId is not
-   * in the sockeRoom Map. Therefore, handleDisconnect is not called.
-   * This means that the player does not have a gracePeriod entry
-   * and game.restore() player will return false
-   */
 
   socket.on(EVENTS.REJOIN_ROOM, (payload: { playerId: string; roomId: string }) => {
     const { playerId, roomId } = payload;
