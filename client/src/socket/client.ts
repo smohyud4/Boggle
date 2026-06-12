@@ -4,5 +4,5 @@ const serverUrl = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:3000';
 
 export const socket = io(serverUrl, {
   autoConnect: true,
-  reconnectionAttempts: 10,
+  reconnectionAttempts: 15,
 });
