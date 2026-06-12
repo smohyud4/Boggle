@@ -155,10 +155,17 @@ function handleSocketDisconnect(
   roomId: string,
   reason: 'left' | 'disconnected' = 'left',
 ) {
+  const waitingRoom = waitingPlayers.get(roomId);
   const game = games.get(roomId);
-  if (!game) return;
+  if (!waitingRoom || !game) return;
 
-  game.beginGracePeriod(removeSocketFromRoom, socket.id, io, reason);
+  const playerId = waitingRoom.get(socket.id)?.id;
+  if (!playerId) return;
+
+  waitingRoom.delete(socket.id);
+  socketRoomMap.delete(socket.id);
+
+  game.beginGracePeriod(removeSocketFromRoom, socket.id, playerId, io, reason);
 }
 
 export function registerRoomHandlers(io: Server, socket: Socket): void {
@@ -233,8 +240,9 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
+    const playerId = crypto.randomUUID();
     const player = new Player({
-      id: socket.id,
+      id: playerId,
       name: normalizedName,
       isAdmin: waitingRoom.size === 0,
     });
@@ -256,6 +264,14 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     broadcastLobby(io, normalizedRoomId);
   });
 
+  /**
+   * @bug
+   * On a second refresh, the new client's socketId is not
+   * in the sockeRoom Map. Therefore, handleDisconnect is not called.
+   * This means that the player does not have a gracePeriod entry
+   * and game.restore() player will return false
+   */
+
   socket.on(EVENTS.REJOIN_ROOM, (payload: { playerId: string; roomId: string }) => {
     const { playerId, roomId } = payload;
 
@@ -270,7 +286,9 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     const game = games.get(roomId);
+    const waitingRoom = waitingPlayers.get(roomId);
     if (
+      !waitingRoom ||
       !game ||
       game.status === GAME_STATUS.CANCELLED ||
       game.getPlayerById(playerId) === undefined
@@ -285,7 +303,15 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     socket.join(roomId);
-    socketRoomMap.set(playerId, socket.id);
+
+    const player = game.getPlayerById(playerId);
+    if (!player) {
+      emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
+      return;
+    }
+
+    socketRoomMap.set(socket.id, roomId);
+    waitingRoom.set(socket.id, player);
     const roundNumber = game.round;
 
     if (game.status === GAME_STATUS.ROUND_IN_PROGRESS) {
@@ -306,12 +332,6 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
         results: playerResults,
       });
     } else if (game.status === GAME_STATUS.LOBBY) {
-      const player = game.getPlayerById(playerId);
-      if (!player) {
-        emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
-        return;
-      }
-
       socket.emit(EVENTS.ROOM_JOINED, {
         roomId: roomId,
         playerId: player.id,
@@ -382,7 +402,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const player = game.players.find((entry) => entry.id === socket.id);
+    const player = waitingPlayers.get(roomId)?.get(socket.id);
     if (!player) {
       emitError(socket, 'Player is not in this game.', { roomId });
       return;
@@ -439,7 +459,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const player = game.players.find((entry) => entry.id === socket.id);
+    const player = waitingPlayers.get(roomId)?.get(socket.id);
     if (!player) {
       return;
     }
@@ -453,7 +473,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    game.addWords(socket.id, normalizeWords(words), game.round);
+    game.addWords(player.id, normalizeWords(words), game.round);
   });
 
   socket.on(EVENTS.LEAVE_ROOM, (payload: LeaveRoomPayload = {}) => {

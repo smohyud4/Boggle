@@ -1,4 +1,4 @@
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { GAME_CONFIG, GAME_STATUS } from '../constants/config.js';
 import type { GameInitializer, GameStatus, RoundResult } from '../types.js';
 import { generateBoards } from '../utils/game.js';
@@ -219,6 +219,7 @@ export class Game {
 
   beginGracePeriod(
     removePermanently: any,
+    socketId: string,
     playerId: string,
     io: Server,
     reason: 'left' | 'disconnected' = 'left',
@@ -226,7 +227,7 @@ export class Game {
     this.restorePlayer(playerId);
 
     const timeOutId = setTimeout(() => {
-      removePermanently(io, playerId, this.roomId, reason);
+      removePermanently(io, socketId, this.roomId, reason);
     }, 60 * 1000);
 
     this.gracePeriodIds.set(playerId, timeOutId);
