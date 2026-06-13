@@ -74955,6 +74955,7 @@ jetton
 jettons
 jetty
 jettying
+jew
 jewel
 jeweled
 jeweler
@@ -74974,6 +74975,7 @@ jewelweed
 jewelweeds
 jewfish
 jewfishes
+jews
 jger
 jiao
 jiaos
@@ -88867,9 +88869,7 @@ mph
 mridang
 mro
 msalliance
-msl
 mster
-mtg
 mtier
 much
 muches
