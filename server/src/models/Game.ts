@@ -227,7 +227,7 @@ export class Game {
     this.restorePlayer(playerId);
 
     const timeOutId = setTimeout(() => {
-      removePermanently(io, socketId, this.roomId, reason);
+      removePermanently(io, socketId, this.roomId, reason, playerId);
     }, 60 * 1000);
 
     this.gracePeriodIds.set(playerId, timeOutId);

@@ -102,17 +102,18 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
 
 function removeSocketFromRoom(
   io: Server,
-  id: string,
+  socketId: string,
   roomId: string,
   reason: 'left' | 'disconnected' = 'left',
+  playerId: string = '',
 ): void {
   const waitingRoom = waitingPlayers.get(roomId);
   const game = games.get(roomId);
   if (!waitingRoom || !game) return;
 
-  const player = waitingRoom.get(id);
-  waitingRoom.delete(id);
-  socketRoomMap.delete(id);
+  const player = waitingRoom.get(socketId) ?? game.getPlayerById(playerId);
+  waitingRoom.delete(socketId);
+  socketRoomMap.delete(socketId);
 
   if (player) {
     game.removePlayerById(player.id);
