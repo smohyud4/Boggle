@@ -47,7 +47,7 @@ function OnlineGame() {
     startGame: false,
   });
 
-  const playerIdRef = useRef('');
+  const playerIdRef = useRef(localStorage.getItem('player_id') || '');
 
   const roomCode = searchParams.get('room') ?? '';
 
@@ -88,13 +88,21 @@ function OnlineGame() {
       setRoundResult(null);
       setIsAdvancingRound(false);
       setRoomId(payload.roomId);
+      setTotalRounds(payload.totalRounds);
       setGameInfo(payload);
+
+      // Need to sync state for players rejoining
+      if (payload.isAdmin) setIsAdmin(payload.isAdmin);
     };
 
     const onRoundResult = (payload: RoundResultPayload) => {
       setRoundResult(payload);
+      setTotalRounds(payload.totalRounds);
       setIsAdvancingRound(false);
       setIsWaitingOnGame(false);
+
+      // Need to sync state for players rejoining
+      if (payload.isAdmin) setIsAdmin(payload.isAdmin);
     };
 
     const onPlayerLeft = ({ name, reason }: PlayerLeftPayload) => {

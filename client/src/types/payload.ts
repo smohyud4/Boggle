@@ -30,6 +30,7 @@ export type RoundStartPayload = {
   totalRounds: number;
   board: string[];
   expiresAt: number;
+  isAdmin?: boolean;
 };
 
 export type RoundResultPlayerPayload = {
@@ -45,8 +46,10 @@ export type RoundResultPlayerPayload = {
 export type RoundResultPayload = {
   roomId: string;
   round: number;
+  totalRounds: number;
   reason: 'timer_expired' | 'all_submitted';
   results: RoundResultPlayerPayload[];
+  isAdmin?: boolean;
 };
 
 export type GameOverPayload = {

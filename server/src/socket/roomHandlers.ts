@@ -95,6 +95,7 @@ function settleRound(io: Server, roomId: string, reason: 'timer_expired' | 'all_
   io.to(roomId).emit(EVENTS.ROUND_RESULT, {
     roomId,
     round,
+    totalRounds: game.totalRounds,
     reason,
     results: playerResults,
   });
@@ -313,6 +314,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
         totalRounds: game.totalRounds,
         board: game.getBoardForRound(roundNumber),
         expiresAt: game.roundExpiresAt,
+        isAdmin: player.isAdmin,
       });
     } else if (game.status === GAME_STATUS.COMPLETED || game.status === GAME_STATUS.ROUND_OVER) {
       const playerResults = game.getPlayerResults(roundNumber);
@@ -320,8 +322,10 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       socket.emit(EVENTS.ROUND_RESULT, {
         roomId,
         round: roundNumber,
+        totalRounds: game.totalRounds,
         reason: 'timer_expired',
         results: playerResults,
+        isAdmin: player.isAdmin,
       });
     } else if (game.status === GAME_STATUS.LOBBY) {
       socket.emit(EVENTS.ROOM_JOINED, {
