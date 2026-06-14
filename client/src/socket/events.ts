@@ -1,6 +1,7 @@
 export const SOCKET_EVENTS = {
   JOIN_ROOM: 'join_room',
   REJOIN_ROOM: 'rejoin_room',
+  LEAVE_ROOM: 'leave_room',
   START_GAME: 'start_game',
   SUBMIT_WORDS: 'submit_words',
   BEGIN_ROUND: 'begin_round',

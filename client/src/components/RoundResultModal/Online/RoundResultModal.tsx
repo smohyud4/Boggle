@@ -31,6 +31,7 @@ function OnlineRoundResultModal({
 
   const handleRefresh = () => {
     clearSessionFromStorage();
+    socket.emit(SOCKET_EVENTS.LEAVE_ROOM, { roomId });
     window.location.reload();
   };
 

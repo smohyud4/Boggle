@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import LobbyPage from '../../LobbyPage/LobbyPage';
 import WaitingRoom from '../../WaitingRoom/WaitingRoom';
 import ErrorModal from '../../ErrorModal/ErrorModal';
@@ -47,11 +47,14 @@ function OnlineGame() {
     startGame: false,
   });
 
+  const playerIdRef = useRef('');
+
   const roomCode = searchParams.get('room') ?? '';
 
   useEffect(() => {
     const onRoomJoined = (payload: RoomJoinedPayload) => {
       setRoomId(payload.roomId);
+      playerIdRef.current = payload.playerId;
       setIsAdmin(payload.isAdmin);
       setIsWaitingOnGame(payload.waitingOnGame);
       setTotalRounds(payload.totalRounds);
@@ -75,7 +78,7 @@ function OnlineGame() {
       setPlayers(payload.players);
       setCanStart(payload.canStart);
 
-      const me = payload.players.find((player) => player.id === socket.id);
+      const me = payload.players.find((player) => player.id === playerIdRef.current);
       if (me) {
         setIsAdmin(me.isAdmin);
       }

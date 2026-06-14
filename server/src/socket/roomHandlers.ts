@@ -412,7 +412,7 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
     }
 
     const game = games.get(roomId);
-    if (!game) {
+    if (!game || game.status === GAME_STATUS.CANCELLED) {
       broadCastError(io, roomId, 'Room not found.');
       return;
     }
