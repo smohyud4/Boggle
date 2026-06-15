@@ -87,7 +87,8 @@ export function generateBoard(n: number): string[] {
 }
 
 export function generateRoomCode(): string {
-  return Math.random().toString(36).slice(2, 8).toUpperCase();
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  return Array.from({ length: 5 }, () => letters[Math.floor(Math.random() * 26)]).join('');
 }
 
 export function getWordScore(word: string, dimension: number) {

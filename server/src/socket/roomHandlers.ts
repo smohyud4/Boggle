@@ -280,28 +280,15 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     const game = games.get(roomId);
     const waitingRoom = waitingPlayers.get(roomId);
-    if (
-      !waitingRoom ||
-      !game ||
-      game.status === GAME_STATUS.CANCELLED ||
-      game.getPlayerById(playerId) === undefined
-    ) {
+    const player = game?.getPlayerById(playerId);
+
+    if (!waitingRoom || !game || game.status === GAME_STATUS.CANCELLED || !player) {
       return;
     }
 
-    const restored = game.restorePlayer(playerId);
-    if (!restored) {
-      emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
-      return;
-    }
+    game.restorePlayer(playerId);
 
     socket.join(roomId);
-
-    const player = game.getPlayerById(playerId);
-    if (!player) {
-      emitError(socket, 'Could not rejoin.', { type: 'connection_error' });
-      return;
-    }
 
     socketRoomMap.set(socket.id, roomId);
     waitingRoom.set(socket.id, player);
@@ -479,8 +466,10 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
   });
 
   socket.on('disconnect', () => {
+    console.log('DISCONNECT FIRED');
     const roomId = socketRoomMap.get(socket.id);
     if (!roomId) return;
+    console.log('HANDLING DISCONNECT');
     handleSocketDisconnect(io, socket, roomId, 'disconnected');
   });
 }
