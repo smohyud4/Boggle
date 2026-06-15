@@ -161,13 +161,14 @@ function handleSocketDisconnect(
   const game = games.get(roomId);
   if (!waitingRoom || !game) return;
 
-  const playerId = waitingRoom.get(socket.id)?.id;
-  if (!playerId) return;
+  const player = waitingRoom.get(socket.id);
+  if (!player) return;
 
   waitingRoom.delete(socket.id);
   socketRoomMap.delete(socket.id);
 
-  game.beginGracePeriod(removeSocketFromRoom, socket.id, playerId, io, reason);
+  player.connected = false;
+  game.beginGracePeriod(removeSocketFromRoom, socket.id, player.id, io, reason);
 }
 
 export function registerRoomHandlers(io: Server, socket: Socket): void {
@@ -292,8 +293,10 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
     socketRoomMap.set(socket.id, roomId);
     waitingRoom.set(socket.id, player);
-    const roundNumber = game.round;
 
+    if (player.connected) return;
+
+    const roundNumber = game.round;
     if (game.status === GAME_STATUS.ROUND_IN_PROGRESS) {
       socket.emit(EVENTS.ROUND_START, {
         roomId,
@@ -325,6 +328,8 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
 
       broadcastLobby(io, roomId);
     }
+
+    player.connected = true;
   });
 
   socket.on(EVENTS.START_GAME, (payload: StartGamePayload = {}) => {
