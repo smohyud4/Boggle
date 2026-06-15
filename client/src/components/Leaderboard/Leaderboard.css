@@ -127,6 +127,17 @@
   .leaderboard__score {
     grid-column: 2;
   }
+
+  .leaderboard__list .left-data {
+    gap: 10%;
+    width: 57%;
+  }
+
+  .leaderboard__name {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 }
 
 @media (max-width: 380px) {
