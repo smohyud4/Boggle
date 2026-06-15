@@ -38,7 +38,7 @@ function CreateForm({ isSubmitting, onSubmit }: CreateFormProps) {
             }
           }}
           placeholder="Enter your name"
-          maxLength={24}
+          maxLength={18}
           required
         />
       </label>

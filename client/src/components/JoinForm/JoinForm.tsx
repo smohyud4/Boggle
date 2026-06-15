@@ -33,7 +33,7 @@ function JoinForm({ isSubmitting, controlledRoomCode, onSubmit }: JoinFormProps)
             }
           }}
           placeholder="Enter your name"
-          maxLength={24}
+          maxLength={18}
           required
         />
       </label>
