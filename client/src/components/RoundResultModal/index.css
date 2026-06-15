@@ -176,3 +176,10 @@
     padding: 10px;
   }
 }
+
+@media (max-width: 380px) {
+  .result-modal {
+    padding: 10px;
+    font-size: 0.625rem;
+  }
+}
