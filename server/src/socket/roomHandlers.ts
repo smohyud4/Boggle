@@ -167,6 +167,10 @@ function handleSocketDisconnect(
   waitingRoom.delete(socket.id);
   socketRoomMap.delete(socket.id);
 
+  // Check if player has already reconnected with a new socket
+  const isAlreadyConnected = [...waitingRoom.values()].some((p) => p.id === player.id);
+  if (isAlreadyConnected) return;
+
   player.connected = false;
   game.beginGracePeriod(removeSocketFromRoom, socket.id, player.id, io, reason);
 }
@@ -471,10 +475,8 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
   });
 
   socket.on('disconnect', () => {
-    console.log('DISCONNECT FIRED');
     const roomId = socketRoomMap.get(socket.id);
     if (!roomId) return;
-    console.log('HANDLING DISCONNECT');
     handleSocketDisconnect(io, socket, roomId, 'disconnected');
   });
 }
