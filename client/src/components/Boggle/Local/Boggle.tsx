@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Arrow, { type ArrowDirection, type ArrowProps } from '../../Arrow/Arrow';
-import { generateBoard, canSpell, formatTime, getWordScore } from '../../../utils/game';
+import {
+  generateBoard,
+  canSpell,
+  formatTime,
+  getWordScore,
+  validateLink,
+} from '../../../utils/game';
 import { useWordList } from '../../../context/WordListContext';
 import LocalRoundResultModal from '../../RoundResultModal/Local/RoundResultModal';
 import '../index.css';
@@ -10,9 +16,13 @@ const ROUND_LENGTH = 180;
 const shouldBeInPortrait = /iPhone|iPod|Android/i.test(navigator.userAgent);
 const MIN_LENGTH = 3;
 
+const urlParams = new URLSearchParams(window.location.search);
+const isChallengeGame = validateLink(urlParams);
+const initBoard = generateBoard(4, urlParams);
+
 function LocalBoggle() {
-  const [boardDimension, setBoardDimension] = useState(4);
-  const [board, setBoard] = useState(generateBoard(boardDimension));
+  const [boardDimension, setBoardDimension] = useState(Math.sqrt(initBoard.length));
+  const [board, setBoard] = useState(initBoard);
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [totalScore, setTotalScore] = useState(0);
@@ -22,6 +32,7 @@ function LocalBoggle() {
   const [prevIndex, setPrevIndex] = useState(-1);
   const [secondsLeft, setSecondsLeft] = useState(ROUND_LENGTH);
   const [roundOver, setRoundOver] = useState(false);
+  const [challengeGame, setChallengeGame] = useState(isChallengeGame);
   const [scoreAnimations, setScoreAnimations] = useState<{ id: number; points: number }[]>([]);
   const [isPortrait, setIsPortrait] = useState(
     window.matchMedia('(orientation: portrait)').matches,
@@ -29,6 +40,7 @@ function LocalBoggle() {
 
   const validWords = useWordList();
 
+  const id = useRef<string | null>(null);
   const letterRefs = useRef<Record<number, HTMLSpanElement | null>>({});
   const selectionActiveRef = useRef(false);
   const roundSubmittedRef = useRef(false);
@@ -41,6 +53,10 @@ function LocalBoggle() {
     const handleOrientationChange = (e: MediaQueryListEvent) => {
       setIsPortrait(e.matches);
     };
+
+    if (isChallengeGame) {
+      id.current = urlParams.get('id');
+    }
 
     const mediaQuery = window.matchMedia('(orientation: portrait)');
 
@@ -257,9 +273,17 @@ function LocalBoggle() {
     setRoundOver(false);
     setArrows([]);
     setSecondsLeft(ROUND_LENGTH);
+    setChallengeGame(false);
     setBoard(generateBoard(boardDimension));
+
+    id.current = null;
     roundSubmittedRef.current = false;
     selectionActiveRef.current = false;
+
+    urlParams.delete('board');
+    urlParams.delete('id');
+    const newUrl = `${window.location.origin}${window.location.pathname}`;
+    window.history.replaceState({}, '', newUrl);
   };
 
   if (!isPortrait && shouldBeInPortrait) {
@@ -323,15 +347,11 @@ function LocalBoggle() {
           <div className="game-sidebar">
             <div className="word-container">
               <h3>Words</h3>
-              {foundWords.length > 0 ? (
-                <ul>
-                  {foundWords.map((foundWord) => (
-                    <li key={foundWord}>{foundWord}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="muted-text">No words found yet.</p>
-              )}
+              <ul>
+                {foundWords.map((foundWord) => (
+                  <li key={foundWord}>{foundWord}</li>
+                ))}
+              </ul>
             </div>
             <div className="score-container">
               <h3>Score</h3>
@@ -339,10 +359,12 @@ function LocalBoggle() {
             </div>
           </div>
         </div>
-        <div id="board-changer">
-          <button onClick={() => handleChangeBoard(4)}>4x4</button>
-          <button onClick={() => handleChangeBoard(5)}>5x5</button>
-        </div>
+        {!challengeGame && (
+          <div id="board-changer">
+            <button onClick={() => handleChangeBoard(4)}>4x4</button>
+            <button onClick={() => handleChangeBoard(5)}>5x5</button>
+          </div>
+        )}
       </div>
 
       {createPortal(
@@ -368,6 +390,10 @@ function LocalBoggle() {
             totalWords: foundWords.length,
             totalScore: 0,
           }}
+          dimension={boardDimension}
+          // eslint-disable-next-line react-hooks/refs
+          gameId={id.current}
+          board={board}
           onNextRound={handleNextRound}
         />
       )}

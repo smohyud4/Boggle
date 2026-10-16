@@ -154,6 +154,18 @@
   font-size: 0.95em;
 }
 
+.local-action {
+  height: 44px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.local-action > svg {
+  width: 20px;
+  height: 20px;
+}
+
 @media (max-width: 480px) {
   .result-modal {
     padding: 15px;

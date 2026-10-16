@@ -69,7 +69,11 @@ const BOGGLE_SCORING_PARAMS: Record<number, Record<number, number>> = {
   },
 };
 
-export function generateBoard(n: number): string[] {
+export function validateLink(params: URLSearchParams) {
+  return params.size === 2 && params.has('board') && params.has('id');
+}
+
+function getRandomBoard(n: number): string[] {
   const board: string[] = [];
   const numbers = Array.from({ length: n * n }, (_, i) => i + 1);
 
@@ -84,6 +88,34 @@ export function generateBoard(n: number): string[] {
   }
 
   return board;
+}
+
+function validateBoard(board: string | null): board is string {
+  if (board === null) return false;
+  let count = 0;
+
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === '-') {
+      if (!/^[a-z]$/.test(board[i + 1])) return false;
+      if (!/^[a-z]$/.test(board[i + 2])) return false;
+      i += 2;
+      count++;
+    } else {
+      if (!/^[a-z]$/.test(board[i])) return false;
+      count++;
+    }
+  }
+
+  return count === 16 || count === 25;
+}
+
+export function generateBoard(n: number, urlParams?: URLSearchParams): string[] {
+  if (urlParams === undefined || !validateLink(urlParams)) return getRandomBoard(n);
+
+  const board = urlParams.get('board');
+  if (!validateBoard(board)) return getRandomBoard(n);
+
+  return decode(board);
 }
 
 export function generateRoomCode(): string {
@@ -148,4 +180,37 @@ export function canSpell(board: string[], word: string) {
   }
 
   return false;
+}
+
+function shift(char: string, amount: number) {
+  return String.fromCharCode(((char.charCodeAt(0) - 97 + amount) % 26) + 97);
+}
+
+export function encode(board: string[]): string {
+  let encoded = '';
+
+  board.forEach((str) => {
+    if (str.length === 2) encoded += '-';
+    for (const char of str) {
+      encoded += shift(char, 4);
+    }
+  });
+
+  return encoded;
+}
+
+export function decode(board: string): string[] {
+  const decoded: string[] = [];
+
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === '-') {
+      const dice = shift(board[i + 1], 26 - 4) + shift(board[i + 2], 26 - 4);
+      decoded.push(dice);
+      i += 2;
+    } else {
+      decoded.push(shift(board[i], 26 - 4));
+    }
+  }
+
+  return decoded;
 }
