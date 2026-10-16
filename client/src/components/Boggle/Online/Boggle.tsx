@@ -330,15 +330,11 @@ function OnlineBoggle({ roomId, round, totalRounds, board, expiresAt }: GameProp
           <div className="game-sidebar">
             <div className="word-container">
               <h3>Words</h3>
-              {foundWords.length > 0 ? (
-                <ul>
-                  {foundWords.map((foundWord) => (
-                    <li key={foundWord}>{foundWord}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="muted-text">No words found yet.</p>
-              )}
+              <ul>
+                {foundWords.map((foundWord) => (
+                  <li key={foundWord}>{foundWord}</li>
+                ))}
+              </ul>
             </div>
             <div className="score-container">
               <h3>Score</h3>
