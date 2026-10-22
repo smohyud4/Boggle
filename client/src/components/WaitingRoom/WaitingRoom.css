@@ -28,7 +28,7 @@
   align-items: center;
   gap: 5px;
   font-size: 0.8em;
-  background-color: var(--secondary-teal);
+  background-color: var(--primary-navy);
   border: transparent;
   padding: 5px 7px;
   cursor: pointer;
@@ -37,7 +37,7 @@
 .copy-icon {
   width: 1.6em;
   height: 1.6em;
-  color: white !important;
+  color: var(--neutral-cream) !important;
 }
 
 .star-icon {
@@ -51,9 +51,9 @@
   align-items: center;
   gap: 10px;
   padding: 5px 5px 5px 10px;
-  color: white;
+  color: var(--neutral-cream);
   border-radius: 5px;
-  background-color: var(--secondary-teal);
+  background-color: var(--primary-navy);
 }
 
 .room-code > span {
@@ -62,7 +62,6 @@
 
 .panel {
   border-radius: 10px;
-  background: var(--dark-cream);
   padding: 16px;
   display: grid;
   gap: 12px;
@@ -105,7 +104,7 @@
 .start-game {
   border: 1px solid #b6b7bc;
   background: var(--primary-navy);
-  color: white;
+  color: var(--neutral-cream);
   border-radius: 8px;
   padding: 10px 14px;
   font: inherit;

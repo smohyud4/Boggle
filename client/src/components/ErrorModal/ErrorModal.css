@@ -37,7 +37,7 @@
 
 .error-modal-button {
   background: var(--primary-navy);
-  color: white;
+  color: var(--neutral-cream);
   border: none;
   padding: 10px 16px;
   border-radius: 6px;

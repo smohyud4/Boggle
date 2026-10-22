@@ -76,7 +76,6 @@
 
 .letter-grid {
   display: grid;
-  background-color: var(--dark-cream);
   padding: 10px;
   flex: 1;
   font-size: 2rem;
@@ -144,7 +143,7 @@
 .word-container {
   contain: size;
   padding: min(10px, 1vw);
-  background-color: var(--dark-cream);
+  border-bottom: 3px solid var(--primary-navy);
   flex: 1;
   max-width: 95%;
   overflow: auto;
@@ -175,7 +174,6 @@
   gap: 8px;
   padding: min(10px, 1vw);
   margin: 0;
-  background-color: var(--dark-cream);
   max-width: 95%;
   height: 25%;
 }

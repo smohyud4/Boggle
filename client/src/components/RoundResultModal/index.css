@@ -40,7 +40,7 @@
 .result-modal__footer button {
   border: 1px solid #b6b7bc;
   background: var(--primary-navy);
-  color: white;
+  color: var(--neutral-cream);
   border-radius: 16px;
   padding: 10px 14px;
   cursor: pointer;
@@ -112,8 +112,8 @@
   min-width: 32px;
   height: 32px;
   border-radius: 999px;
-  background: var(--secondary-teal);
-  color: #1f2430;
+  background: var(--primary-navy);
+  color: var(--neutral-cream);
   font-size: 0.88em;
   font-weight: 700;
 }
@@ -123,7 +123,6 @@
   overflow-y: auto;
   padding-right: 6px;
   border-radius: 14px;
-  background-color: var(--neutral-cream);
 }
 
 .result-card__accepted-words::-webkit-scrollbar {
@@ -151,6 +150,7 @@
 
 .word-list li {
   color: var(--primary-navy);
+  text-decoration: underline;
   font-size: 0.95em;
 }
 

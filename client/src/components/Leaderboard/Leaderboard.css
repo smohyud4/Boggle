@@ -89,7 +89,7 @@
 .new-game {
   border: 1px solid #b6b7bc;
   background: var(--primary-navy);
-  color: white;
+  color: var(--neutral-cream);
   border-radius: 16px;
   padding: 10px 14px;
   cursor: pointer;

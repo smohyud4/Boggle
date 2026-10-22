@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   padding: 12px;
-  background: var(--dark-cream);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header-nav {
@@ -18,7 +18,7 @@
   border: none;
   color: var(--primary-navy);
   font-size: 16px;
-  font-weight: 500;
+  font-weight: bold;
   cursor: pointer;
   padding: 8px 0;
   text-decoration: none;
