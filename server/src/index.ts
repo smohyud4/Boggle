@@ -2,12 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { CLIENT_ORIGIN, PORT } from './constants/config.js';
+import { PORT } from './constants/config.js';
 import { EVENTS } from './constants/events.js';
 import { registerHandlers } from './socket/registerHandlers.js';
 
 const app = express();
-app.use(cors({ origin: CLIENT_ORIGIN }));
+app.use(
+  cors({
+    origin: ['https://boggle-verse.vercel.app', 'https://boggleverse.com', 'http://localhost:5173'],
+  }),
+);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
@@ -17,7 +21,7 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_ORIGIN,
+    origin: ['https://boggle-verse.vercel.app', 'https://boggleverse.com', 'http://localhost:5173'],
   },
 });
 
