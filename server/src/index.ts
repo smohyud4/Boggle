@@ -9,7 +9,11 @@ import { registerHandlers } from './socket/registerHandlers.js';
 const app = express();
 app.use(
   cors({
-    origin: ['https://boggle-verse.vercel.app', 'https://boggleverse.com', 'http://localhost:5173'],
+    origin: [
+      'https://boggle-verse.vercel.app',
+      'https://www.boggleverse.com',
+      'http://localhost:5173',
+    ],
   }),
 );
 
@@ -21,7 +25,11 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ['https://boggle-verse.vercel.app', 'https://boggleverse.com', 'http://localhost:5173'],
+    origin: [
+      'https://boggle-verse.vercel.app',
+      'https://www.boggleverse.com',
+      'http://localhost:5173',
+    ],
   },
 });
 
