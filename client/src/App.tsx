@@ -1,14 +1,19 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import LocalGame from './components/Game/Local/Game';
-import OnlineGame from './components/Game/Online/Game';
+import Loader from './components/Loader/Loader';
+import { lazy, Suspense } from 'react';
+
+const OnlineGame = lazy(() => import('./components/Game/Online/Game'));
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LocalGame />} />
-        <Route path="/online" element={<OnlineGame />} />
-      </Routes>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route path="/" element={<LocalGame />} />
+          <Route path="/online" element={<OnlineGame />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

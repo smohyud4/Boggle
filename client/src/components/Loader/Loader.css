@@ -1,0 +1,56 @@
+.starting-shell {
+  width: 96%;
+  max-width: 400px;
+  display: grid;
+  gap: 16px;
+  place-items: center;
+}
+
+.starting-shell h2 {
+  font-size: 1.2rem;
+}
+
+.loader-container {
+  display: grid;
+  gap: 20px;
+}
+
+.loader-container-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.loader-container-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  display: inline-block;
+  position: relative;
+}
+.loader::after,
+.loader::before {
+  content: '';
+  width: 48px;
+  height: 48px;
+  border: 2px solid #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  animation: rotation 2s ease-in-out infinite;
+}
+.loader::after {
+  border-color: var(--secondary-teal);
+  animation-delay: 1s;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

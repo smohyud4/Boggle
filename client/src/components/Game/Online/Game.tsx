@@ -171,10 +171,6 @@ function OnlineGame() {
     });
     socket.on('connect', onConnect);
 
-    if (socket.connected) {
-      onConnect();
-    }
-
     socket.on(SOCKET_EVENTS.ROOM_JOINED, onRoomJoined);
     socket.on(SOCKET_EVENTS.LOBBY_UPDATED, onLobbyUpdated);
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -182,6 +178,8 @@ function OnlineGame() {
     socket.on(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
     socket.on(SOCKET_EVENTS.ERROR_EVENT, onError);
     socket.on(SOCKET_EVENTS.WARNING_EVENT, onWarning);
+
+    socket.connect();
 
     return () => {
       socket.off('disconnect');
@@ -194,6 +192,9 @@ function OnlineGame() {
       socket.off(SOCKET_EVENTS.PLAYER_LEFT, onPlayerLeft);
       socket.off(SOCKET_EVENTS.ERROR_EVENT, onError);
       socket.off(SOCKET_EVENTS.WARNING_EVENT, onWarning);
+
+      socket.disconnect();
+      clearSessionFromStorage();
     };
   }, []);
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { socket } from '../../socket/client';
 import { SOCKET_EVENTS } from '../../socket/events';
+import Loader from '../Loader/Loader';
 import { Flip, toast } from 'react-toastify';
 import { Check, Copy, Star } from 'lucide-react';
 import type { LobbyPlayer } from '../../types/payload';
@@ -92,16 +93,7 @@ function WaitingRoom({
   };
 
   if (countdown) {
-    return (
-      <section className="starting-shell">
-        <div className={`loader-container loader-container-${boardDimension}`}>
-          {Array.from({ length: boardDimension * boardDimension }).map((_, index) => (
-            <span key={index} className="loader" />
-          ))}
-        </div>
-        <h2>Game is Starting...</h2>
-      </section>
-    );
+    return <Loader boardDimension={boardDimension} helperText="Game is Starting..." />;
   }
 
   return (

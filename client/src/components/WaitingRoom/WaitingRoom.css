@@ -1,15 +1,3 @@
-.starting-shell {
-  width: 96%;
-  max-width: 400px;
-  display: grid;
-  gap: 16px;
-  place-items: center;
-}
-
-.starting-shell h2 {
-  font-size: 1.2rem;
-}
-
 .waiting-shell {
   width: 96%;
   max-width: 460px;
@@ -94,13 +82,6 @@
   color: var(--muted-text);
 }
 
-.countdown {
-  margin: 0;
-  color: #1f2430;
-  font-size: 3rem;
-  text-align: center;
-}
-
 .start-game {
   border: 1px solid #b6b7bc;
   background: var(--primary-navy);
@@ -117,56 +98,7 @@
   cursor: not-allowed;
 }
 
-.loader-container {
-  display: grid;
-  gap: 20px;
-}
-
-.loader-container-4 {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.loader-container-5 {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.loader {
-  width: 48px;
-  height: 48px;
-  display: inline-block;
-  position: relative;
-}
-.loader::after,
-.loader::before {
-  content: '';
-  width: 48px;
-  height: 48px;
-  border: 2px solid #fff;
-  position: absolute;
-  left: 0;
-  top: 0;
-  box-sizing: border-box;
-  animation: rotation 2s ease-in-out infinite;
-}
-.loader::after {
-  border-color: var(--secondary-teal);
-  animation-delay: 1s;
-}
-
-@keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 @media (max-width: 480px) {
-  .starting-shell h2 {
-    font-size: 1.2rem;
-  }
-
   .panel {
     font-size: 0.8rem;
   }
@@ -174,9 +106,5 @@
   .room-code {
     font-size: 0.8rem;
     justify-content: center;
-  }
-
-  .countdown {
-    font-size: 2.4rem;
   }
 }
