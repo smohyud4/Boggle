@@ -8,7 +8,13 @@ const OnlineGame = lazy(() => import('./components/Game/Online/Game'));
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<Loader />}>
+      <Suspense
+        fallback={
+          <main className="app">
+            <Loader />
+          </main>
+        }
+      >
         <Routes>
           <Route path="/" element={<LocalGame />} />
           <Route path="/online" element={<OnlineGame />} />
